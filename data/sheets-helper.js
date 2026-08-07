@@ -1,14 +1,15 @@
-// sheets-helper.js
-// Helper untuk menyinkronkan data dengan Google Sheets via Apps Script Web App.
-// - Letakkan file ini di repo pada path data/sheets-helper.js
-// - Pastikan tag <script src="data/sheets-helper.js"></script> dimuat DI AKHIR index.html (sebelum </body>)
-// - Sesuaikan APP_SCRIPT_URL jika Anda redeploy Apps Script ke URL lain.
+/* data/sheets-helper.js
+   Helper untuk sinkronisasi dengan Google Sheets (Apps Script Web App).
+   - Letakkan di repo path: data/sheets-helper.js
+   - Pastikan <script src="data/sheets-helper.js"></script> sudah ada di index.html (sebelum </body>).
+   - APP_SCRIPT_URL harus menunjuk ke Web App URL Anda (gunakan yang sudah Anda deploy).
+*/
 
 (function(){
-  // === GANTI INI dengan Apps Script Web App URL Anda jika perlu ===
+  // GANTI DENGAN URL Apps Script Web App ANDA jika berbeda
   const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6nFx5d2ONxdQf2iIFCwbNALz8prY_Vm_gOi2Tfg4S8bmB-Jd2fzSqg79GWWCJ81hWNw/exec";
 
-  // --- Helper HTTP ------------------------------------------------------
+  // --- GET helper (baca) ------------------------------------------------
   async function fetchFromSheets(action) {
     try {
       const url = `${APP_SCRIPT_URL}?action=${encodeURIComponent(action)}`;
@@ -27,34 +28,30 @@
     }
   }
 
-  // POST as form-urlencoded to avoid CORS preflight
+  // --- Write via GET (encode data into querystring) ----------------------
+  // Using GET avoids CORS preflight issues in Apps Script Web Apps.
   async function postToSheets(action, dataPayload) {
     try {
-      const body = new URLSearchParams();
-      body.append('action', action);
-      body.append('data', typeof dataPayload === 'string' ? dataPayload : JSON.stringify(dataPayload));
+      const params = new URLSearchParams();
+      params.append('action', action);
+      params.append('data', typeof dataPayload === 'string' ? dataPayload : JSON.stringify(dataPayload));
 
-      const res = await fetch(APP_SCRIPT_URL, {
-        method: 'POST',
-        body: body // no custom headers -> browser uses application/x-www-form-urlencoded
-      });
-
-      // try parse JSON, but guard if response not JSON
-      let text = await res.text();
-      try {
-        const json = JSON.parse(text);
-        return json;
-      } catch (e) {
-        // not JSON; return raw text
-        return { ok: false, error: 'Non-JSON response', raw: text };
+      const url = APP_SCRIPT_URL + '?' + params.toString();
+      const res = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
+      if (!res.ok) {
+        const txt = await res.text();
+        console.warn('[Sheets] postToSheets GET non-OK', res.status, txt);
+        return { ok: false, status: res.status, raw: txt };
       }
+      const json = await res.json();
+      return json;
     } catch (err) {
       console.error('[Sheets] postToSheets error', err);
       throw err;
     }
   }
 
-  // --- Seed localStorage dari Sheets bila kosong ------------------------
+  // --- Seed localStorage from Sheets if empty ---------------------------
   async function seedFromSheetsIfEmpty() {
     try {
       if (!localStorage.getItem('three4five_menu')) {
@@ -83,8 +80,7 @@
     }
   }
 
-  // --- override fungsi kirimKeGoogleSheets supaya gunakan postToSheets ----
-  // Pastikan script ini di-load setelah script utama index.html sehingga override bekerja.
+  // --- Override existing kirimKeGoogleSheets to use postToSheets ----------
   window.kirimKeGoogleSheets = function(tanggalStr, keteranganStr, masukNominal, metodeBayar) {
     const dataKirim = {
       date: tanggalStr,
@@ -102,13 +98,11 @@
       .catch(err => console.warn('[Sheets] gagal post transaction', err));
   };
 
-  // --- attach listeners untuk expense & capital forms -------------------
+  // --- Attach listeners for expense & capital forms (auto sync) ---------
   function attachFormSyncListeners() {
-    // Expense form
     const expenseForm = document.getElementById('add-expense-form');
     if (expenseForm) {
       expenseForm.addEventListener('submit', () => {
-        // delay untuk memberi waktu handler asli menyimpan ke localStorage dulu
         setTimeout(() => {
           try {
             const list = JSON.parse(localStorage.getItem('three4five_expenses') || '[]');
@@ -124,7 +118,6 @@
       });
     }
 
-    // Capital form
     const capitalForm = document.getElementById('add-capital-form');
     if (capitalForm) {
       capitalForm.addEventListener('submit', () => {
@@ -144,7 +137,7 @@
     }
   }
 
-  // --- manual sync helpers (optional UI calls) --------------------------
+  // --- Optional helpers -------------------------------------------------
   async function syncMenuToLocal() {
     const menu = await fetchFromSheets('getMenu');
     if (Array.isArray(menu)) {
@@ -155,13 +148,7 @@
     return false;
   }
 
-  async function pushFullMenuToSheets(menuArray) {
-    // Use action 'saveMenu' if Apps Script supports replacing menu sheet entirely
-    // Otherwise push items individually with another action implementation
-    return postToSheets('saveMenu', menuArray);
-  }
-
-  // --- init on load -----------------------------------------------------
+  // --- Init -------------------------------------------------------------
   function initSheetsHelper() {
     seedFromSheetsIfEmpty().finally(() => {
       attachFormSyncListeners();
@@ -174,13 +161,11 @@
     initSheetsHelper();
   }
 
-  // expose debug helpers
+  // Expose debug helpers
   window.__three4five_sheets = {
     postToSheets,
     fetchFromSheets,
     syncMenuToLocal,
-    pushFullMenuToSheets,
     APP_SCRIPT_URL
   };
-
 })();
