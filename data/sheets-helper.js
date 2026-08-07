@@ -7,7 +7,7 @@
 
 (function(){
   // GANTI DENGAN URL Apps Script Web App ANDA jika berbeda
-  const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6nFx5d2ONxdQf2iIFCwbNALz8prY_Vm_gOi2Tfg4S8bmB-Jd2fzSqg79GWWCJ81hWNw/exec";
+  const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxC1XthuCVaKdhD1Jj9uJbOjgtbsleRe07TexKANAfscbBDWBXFfR5b5q2Iypin6b5ybw/exec";
 
   // --- GET helper (baca) ------------------------------------------------
   async function fetchFromSheets(action) {
