@@ -1,48 +1,60 @@
-/* sheets-helper.js
-   Helper untuk menyinkronkan data dengan Google Sheets via Apps Script Web App.
-   Cara pakai:
-   - Taruh file ini di repo dan tambahkan <script src="data/sheets-helper.js"></script> tepat sebelum </body>.
-   - Pastikan Apps Script Web App URL sudah ter-deploy dan ditaruh pada APP_SCRIPT_URL di bawah.
-   - Helper ini akan otomatis seed localStorage dari Sheets bila kosong,
-     mengirim transaksi/expense/capital saat dibuat, dan memberi log ke console.
-*/
+// sheets-helper.js
+// Helper untuk menyinkronkan data dengan Google Sheets via Apps Script Web App.
+// - Letakkan file ini di repo pada path data/sheets-helper.js
+// - Pastikan tag <script src="data/sheets-helper.js"></script> dimuat DI AKHIR index.html (sebelum </body>)
+// - Sesuaikan APP_SCRIPT_URL jika Anda redeploy Apps Script ke URL lain.
 
 (function(){
-  // Ganti dengan Apps Script URL Anda (yang Anda berikan)
+  // === GANTI INI dengan Apps Script Web App URL Anda jika perlu ===
   const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6nFx5d2ONxdQf2iIFCwbNALz8prY_Vm_gOi2Tfg4S8bmB-Jd2fzSqg79GWWCJ81hWNw/exec";
 
-  // --- HTTP helpers -------------------------------------------------------
+  // --- Helper HTTP ------------------------------------------------------
   async function fetchFromSheets(action) {
     try {
       const url = `${APP_SCRIPT_URL}?action=${encodeURIComponent(action)}`;
-      const res = await fetch(url, { method: 'GET', headers: { 'Accept':'application/json' } });
+      const res = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
+      if (!res.ok) {
+        console.warn('[Sheets] fetchFromSheets non-OK status', res.status);
+        return null;
+      }
       const json = await res.json();
       if (json && json.ok) return json.result;
-      console.warn('fetchFromSheets: unexpected response', json);
+      console.warn('[Sheets] fetchFromSheets unexpected response', json);
       return null;
     } catch (err) {
-      console.warn('fetchFromSheets error', err);
+      console.warn('[Sheets] fetchFromSheets error', err);
       return null;
     }
   }
 
+  // POST as form-urlencoded to avoid CORS preflight
   async function postToSheets(action, dataPayload) {
     try {
-      const body = { action: action, data: dataPayload };
+      const body = new URLSearchParams();
+      body.append('action', action);
+      body.append('data', typeof dataPayload === 'string' ? dataPayload : JSON.stringify(dataPayload));
+
       const res = await fetch(APP_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: body // no custom headers -> browser uses application/x-www-form-urlencoded
       });
-      const json = await res.json();
-      return json;
+
+      // try parse JSON, but guard if response not JSON
+      let text = await res.text();
+      try {
+        const json = JSON.parse(text);
+        return json;
+      } catch (e) {
+        // not JSON; return raw text
+        return { ok: false, error: 'Non-JSON response', raw: text };
+      }
     } catch (err) {
-      console.error('postToSheets error', err);
+      console.error('[Sheets] postToSheets error', err);
       throw err;
     }
   }
 
-  // --- seed localStorage dari Sheets bila kosong -------------------------
+  // --- Seed localStorage dari Sheets bila kosong ------------------------
   async function seedFromSheetsIfEmpty() {
     try {
       if (!localStorage.getItem('three4five_menu')) {
@@ -71,11 +83,9 @@
     }
   }
 
-  // --- override fungsi kirimKeGoogleSheets (compat) -----------------------
-  // Jika index.html sudah punya fungsi kirimKeGoogleSheets, deklarasi berikut
-  // akan menggantinya (garansi: script ini harus di-load setelah index.html main script).
+  // --- override fungsi kirimKeGoogleSheets supaya gunakan postToSheets ----
+  // Pastikan script ini di-load setelah script utama index.html sehingga override bekerja.
   window.kirimKeGoogleSheets = function(tanggalStr, keteranganStr, masukNominal, metodeBayar) {
-    // Bentuk data yang kita kirim ke Apps Script (sesuai doPost pada Apps Script)
     const dataKirim = {
       date: tanggalStr,
       desc: keteranganStr,
@@ -84,22 +94,21 @@
       method: metodeBayar,
       timestamp: Date.now()
     };
-    // Post ke Sheets menggunakan action 'addTransaction' (Apps Script harus menangani)
     postToSheets('addTransaction', dataKirim)
       .then(resp => {
         if (resp && resp.ok) console.log('[Sheets] Transaksi tersimpan via Apps Script');
-        else console.warn('[Sheets] resp unexpected', resp);
+        else console.warn('[Sheets] postToSheets response', resp);
       })
       .catch(err => console.warn('[Sheets] gagal post transaction', err));
   };
 
-  // --- helper: kirim expense & capital jika form di-submit ----------------
+  // --- attach listeners untuk expense & capital forms -------------------
   function attachFormSyncListeners() {
-    // Expense
+    // Expense form
     const expenseForm = document.getElementById('add-expense-form');
     if (expenseForm) {
       expenseForm.addEventListener('submit', () => {
-        // delay sedikit supaya handler asli menyimpan ke localStorage dahulu
+        // delay untuk memberi waktu handler asli menyimpan ke localStorage dulu
         setTimeout(() => {
           try {
             const list = JSON.parse(localStorage.getItem('three4five_expenses') || '[]');
@@ -111,11 +120,11 @@
               }).catch(e => console.warn('[Sheets] expense post error', e));
             }
           } catch (e) { console.warn('[Sheets] expense listener read error', e); }
-        }, 120);
+        }, 150);
       });
     }
 
-    // Capital
+    // Capital form
     const capitalForm = document.getElementById('add-capital-form');
     if (capitalForm) {
       capitalForm.addEventListener('submit', () => {
@@ -130,29 +139,47 @@
               }).catch(e => console.warn('[Sheets] capital post error', e));
             }
           } catch (e) { console.warn('[Sheets] capital listener read error', e); }
-        }, 120);
+        }, 150);
       });
     }
   }
 
-  // --- auto-run on load (seed + attach listeners) -------------------------
+  // --- manual sync helpers (optional UI calls) --------------------------
+  async function syncMenuToLocal() {
+    const menu = await fetchFromSheets('getMenu');
+    if (Array.isArray(menu)) {
+      localStorage.setItem('three4five_menu', JSON.stringify(menu));
+      console.log('[Sheets] menu synced to localStorage');
+      return true;
+    }
+    return false;
+  }
+
+  async function pushFullMenuToSheets(menuArray) {
+    // Use action 'saveMenu' if Apps Script supports replacing menu sheet entirely
+    // Otherwise push items individually with another action implementation
+    return postToSheets('saveMenu', menuArray);
+  }
+
+  // --- init on load -----------------------------------------------------
   function initSheetsHelper() {
     seedFromSheetsIfEmpty().finally(() => {
       attachFormSyncListeners();
     });
   }
 
-  // Run after DOM ready (if script loaded at end of body it's fine)
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSheetsHelper);
   } else {
     initSheetsHelper();
   }
 
-  // expose a couple of helpers for debugging if needed
+  // expose debug helpers
   window.__three4five_sheets = {
     postToSheets,
     fetchFromSheets,
+    syncMenuToLocal,
+    pushFullMenuToSheets,
     APP_SCRIPT_URL
   };
 
