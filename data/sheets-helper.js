@@ -11,7 +11,7 @@
 
 (function(){
   // === GANTI INI dengan Apps Script Web App URL Anda jika perlu ===
-  const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnzu3j8EnMzJAw1bIsTqt_4jI_yFwrc1ay72LcdUGizYBqPpArMPiBFUEWRDLZE3rGaA/exec";
+  const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybubUtJmeM84KL6TYMa3JY1JapGj4EvJh3ncdzxIJh8BIinRiYKnZIkAr2uYQPaA95Sw/exec";
 
   // ---------------- JSONP helper --------------------------------------
   function jsonpRequest(params, timeoutMs = 8000) {
