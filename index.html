@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Three4Five Coffee</title>
+
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    /* ============ COMMON / COMBINED STYLES FROM ORIGINAL FILES ============ */
+    :root {
+      --primary-green: #064e3b;
+      --primary-hover: #022c22;
+      --light-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-dark: #0f172a;
+      --text-light: #64748b;
+      --border-color: #e2e8f0;
+      --accent-gold: #d97706;
+    }
+
+    html,body { height:100%; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-dark);
+      margin: 0;
+      min-height: 100vh;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    .card { border: 1px solid var(--border-color); border-radius: 16px; background-color: var(--card-bg);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01), 0 2px 4px -1px rgba(0,0,0,0.01); transition: all 0.2s ease; }
+
+    .btn-success-custom { background-color: var(--primary-green); color: white; border: none; border-radius: 10px;
+      padding: 11px; font-weight: 600; transition: all 0.2s ease; }
+    .btn-success-custom:hover { background-color: var(--primary-hover); color: white; }
+
+    /* Header */
+    .elegant-header { background-color: white; padding: 12px 28px; border-bottom: 1px solid var(--border-color);
+      display:flex; justify-content:space-between; align-items:center; height:70px; box-shadow:0 1px 3px rgba(0,0,0,0.02);
+      position: sticky; top: 0; z-index: 1000; }
+
+    .brand-title { font-weight:700; color:var(--primary-green); font-size:1.25rem; letter-spacing:-0.5px; margin:0; }
+
+    /* Login card */
+    .login-card { background:white; border:1px solid var(--border-color); border-radius:20px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+      width:100%; max-width:400px; padding:40px; }
+
+    .role-badge { background-color:#ecfdf5; color:var(--primary-green); padding:6px 16px; border-radius:50px;
+      font-size:0.8rem; font-weight:600; text-decoration:none; border:1px solid #a7f3d0; transition: all .2s; }
+
+    /* Menu cards */
+    .menu-card { cursor:pointer; overflow:hidden; }
+    .menu-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+    .menu-img { height:130px; object-fit:cover; width:100%; }
+
+    /* Misc */
+    .hidden { display: none !important; }
+    .container-max { max-width: 1400px; margin: 0 auto; padding: 1rem; }
+    .text-purple { color: #7c3aed; }
+  </style>
+</head>
+<body>
+
+  <!-- --------- PAGES (ALL IN ONE) ---------- -->
+  <!-- LOGIN PAGE -->
+  <main id="page-login" class="">
+    <div style="height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
+      <div class="login-card">
+        <center><h1 class="brand-title">Three4Five Coffee</h1></center>
+        <p class="text-center text-muted small mb-4">Sistem Point of Sales & Admin</p>
+
+        
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="mb-3">
+            <label class="form-label small text-muted fw-semibold">Username</label>
+            <input type="text" class="form-control" id="login-username" required placeholder="Masukkan username">
+          </div>
+          <div class="mb-4">
+            <label class="form-label small text-muted fw-semibold">Password</label>
+            <input type="password" class="form-control" id="login-password" required placeholder="Masukkan password">
+          </div>
+          <button type="submit" class="btn btn-login shadow-sm btn-success-custom">Masuk Sistem</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- KASIR PAGE -->
+  <main id="page-kasir" class="hidden">
+    <div class="elegant-header">
+      <h1 class="brand-title">Three4Five - Kasir POS</h1>
+      <div>
+        <a href="#login" onclick="logout()" class="btn btn-outline-danger btn-sm me-2 rounded-pill px-3">Keluar</a>
+        <a href="#admin" id="nav-admin-link" class="role-badge" style="display:none;" onclick="navigateTo('admin')">Dashboard Admin →</a>
+      </div>
+    </div>
+
+    <div class="container-fluid py-4 px-4 container-max">
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+            <button class="category-btn active" onclick="filterCategory('all', this)">Semua Menu</button>
+            <button class="category-btn" onclick="filterCategory('ice-coffee', this)">Ice Coffee</button>
+            <button class="category-btn" onclick="filterCategory('americano', this)">Americano</button>
+            <button class="category-btn" onclick="filterCategory('non-coffee', this)">Non Coffee</button>
+          </div>
+
+          <div class="row g-3" id="menu-grid"></div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card p-4 bg-white sticky-top" style="top:20px;">
+            <h5 class="fw-bold mb-3 text-dark">🛒 Pesanan Saat Ini</h5>
+            <div class="table-responsive mb-3" style="max-height:250px; overflow-y:auto;">
+              <table class="table table-borderless align-middle mb-0">
+                <tbody id="cart-list">
+                  <tr><td colspan="4" class="text-center text-muted py-4 small">Keranjang masih kosong.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <hr class="text-muted">
+            <div class="d-flex justify-content-between mb-2 small text-muted"><span>Subtotal</span><span id="subtotal-text" class="fw-semibold text-dark">Rp 0</span></div>
+            <div class="d-flex justify-content-between mb-3 small text-muted"><span>Pajak (0%)</span><span class="fw-semibold text-dark">Rp 0</span></div>
+            <div class="d-flex justify-content-between mb-4"><span class="fw-bold text-dark">Total Pembayaran</span><span id="total-text" class="fw-bold text-success fs-5">Rp 0</span></div>
+
+            <div class="mb-3">
+              <label class="form-label small text-muted fw-semibold">Metode Pembayaran</label>
+              <select class="form-select" id="payment-method">
+                <option value="Tunai">Tunai (Cash)</option>
+                <option value="QRIS">QRIS</option>
+              </select>
+            </div>
+
+            <button class="btn btn-success-custom w-100 shadow-sm" onclick="openPaymentModal()">Proses Pembayaran</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Modal (shared) -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius:16px;">
+          <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+            <h5 class="modal-title fw-bold text-dark">💵 Konfirmasi Pembayaran</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <div class="mb-3"><span class="text-muted small">Total Tagihan:</span><h3 class="fw-bold text-success" id="modal-total-text">Rp 0</h3></div>
+            <div class="mb-3" id="cash-input-container">
+              <label class="form-label small text-muted fw-semibold">Uang Tunai Diterima (Rp)</label>
+              <input type="number" class="form-control" id="cash-received" placeholder="Contoh: 50000" oninput="calculateChange()">
+            </div>
+            <div class="mb-4" id="change-container"><span class="text-muted small">Kembalian:</span><h4 class="fw-bold text-dark" id="change-text">Rp 0</h4></div>
+            <button class="btn btn-success-custom w-100 shadow-sm" onclick="finalizeTransaction()">Selesaikan Transaksi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN PAGE -->
+  <main id="page-admin" class="hidden">
+    <div class="elegant-header">
+      <h1 class="brand-title">☕ Three4Five - Admin Dashboard</h1>
+      <div>
+        <a href="#login" onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-medium">Keluar</a>
+      </div>
+    </div>
+
+    <div class="container py-4 px-4 container-max" style="max-width:1350px;">
+      <ul class="nav nav-pills mb-4 gap-2 flex-wrap" id="adminTab" role="tablist">
+        <li class="nav-item" role="presentation"><button class="nav-link active" id="dashboard-tab" data-bs-toggle="pill" data-bs-target="#dashboard-content" type="button" role="tab">📊 Dashboard</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" id="menu-tab" data-bs-toggle="pill" data-bs-target="#menu-content" type="button" role="tab">🍔 Kelola Menu & Stok</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" id="ingredient-tab" data-bs-toggle="pill" data-bs-target="#ingredient-content" type="button" role="tab">🌾 Bahan Baku</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" id="finance-tab" data-bs-toggle="pill" data-bs-target="#finance-content" type="button" role="tab">💰 Keuangan & Kas</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" id="account-tab" data-bs-toggle="pill" data-bs-target="#account-content" type="button" role="tab">👤 Kelola Akun</button></li>
+      </ul>
+
+      <div class="tab-content" id="adminTabContent">
+        <!-- DASHBOARD -->
+        <div class="tab-pane fade show active" id="dashboard-content" role="tabpanel">
+          <div class="mb-4"><h4 class="fw-bold text-dark mb-1">Ringkasan Performa Kafe</h4><p class="text-muted small">Statistik menyeluruh omzet, pengeluaran, laba bersih, dan saldo kas.</p></div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-xl-3 col-md-6"><div class="card stat-card revenue h-100 p-3"><span class="text-muted small fw-semibold">TOTAL OMZET</span><h3 class="fw-bold text-success mb-0 mt-2" id="admin-total-revenue">Rp 0</h3></div></div>
+            <div class="col-xl-3 col-md-6"><div class="card stat-card expense h-100 p-3"><span class="text-muted small fw-semibold">TOTAL PENGELUARAN</span><h3 class="fw-bold text-danger mb-0 mt-2" id="admin-total-expense">Rp 0</h3></div></div>
+            <div class="col-xl-3 col-md-6"><div class="card stat-card profit h-100 p-3"><span class="text-muted small fw-semibold">LABA BERSIH (PROFIT)</span><h3 class="fw-bold text-primary mb-0 mt-2" id="admin-net-profit">Rp 0</h3></div></div>
+            <div class="col-xl-3 col-md-6"><div class="card stat-card balance h-100 p-3"><span class="text-muted small fw-semibold">SALDO KAS SAAT INI</span><h3 class="fw-bold text-purple mb-0 mt-2" id="admin-current-balance">Rp 0</h3></div></div>
+          </div>
+
+          <div class="card p-4">
+            <h5 class="fw-bold text-success mb-3">📅 Performa Hari Ini (<span id="current-date-label">Hari Ini</span>)</h5>
+            <div class="row g-3">
+              <div class="col-md-4"><div class="p-3 bg-light rounded-3 border"><span class="text-muted small fw-medium">Omzet Hari Ini</span><h4 class="fw-bold text-success mb-0 mt-1" id="daily-revenue">Rp 0</h4></div></div>
+              <div class="col-md-4"><div class="p-3 bg-light rounded-3 border"><span class="text-muted small fw-medium">Total Transaksi</span><h4 class="fw-bold text-dark mb-0 mt-1" id="daily-trx-count">0 Trx</h4></div></div>
+              <div class="col-md-4"><div class="p-3 bg-light rounded-3 border"><span class="text-muted small fw-medium">Menu Terjual</span><h4 class="fw-bold text-primary mb-0 mt-1" id="daily-items-sold">0 Porsi</h4></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MENU CONTENT -->
+        <div class="tab-pane fade" id="menu-content" role="tabpanel">
+          <div class="mb-4"><h4 class="fw-bold text-dark mb-1">Manajemen Menu & Inventaris Stok</h4><p class="text-muted small">Tambah menu baru, atur harga, dan pantau ketersediaan stok porsi.</p></div>
+
+          <div class="row g-4">
+            <div class="col-lg-4">
+              <div class="card p-4 h-100">
+                <h5 class="fw-bold mb-3 text-dark">➕ Tambah Menu Baru</h5>
+                <form id="add-menu-form" onsubmit="handleAddNewMenu(event)">
+                  <div class="mb-3"><label class="form-label">Nama Menu</label><input type="text" class="form-control" id="new-menu-name" required placeholder="Contoh: Kopi Susu"></div>
+                  <div class="mb-3"><label class="form-label">Kategori</label>
+                    <select class="form-select" id="new-menu-category"><option value="ice-coffee">Ice Coffee</option><option value="americano">Americano</option><option value="non-coffee">Non Coffee</option></select>
+                  </div>
+                  <div class="mb-3"><label class="form-label">Harga Jual (Rp)</label><input type="number" class="form-control" id="new-menu-price" required placeholder="18000"></div>
+                  <div class="mb-3"><label class="form-label">Stok Awal (Porsi)</label><input type="number" class="form-control" id="new-menu-stock" required placeholder="50" value="50"></div>
+                  <div class="mb-4"><label class="form-label">Upload Gambar</label><input type="file" class="form-control" id="new-menu-image-file" accept="image/*"></div>
+                  <button type="submit" class="btn btn-success-custom w-100 shadow-sm">Simpan Menu Baru</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="col-lg-8">
+              <div class="card p-4 h-100">
+                <h5 class="fw-bold mb-3 text-dark">📦 Daftar Inventaris Menu & Stok</h5>
+                <div class="table-responsive" style="max-height:480px; overflow-y:auto;">
+                  <table class="table table-hover align-middle"><thead><tr><th>Menu</th><th>Kategori</th><th>Harga</th><th class="text-center">Stok Sisa</th><th class="text-end">Aksi</th></tr></thead>
+                    <tbody id="admin-menu-list"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INGREDIENT CONTENT -->
+        <div class="tab-pane fade" id="ingredient-content" role="tabpanel">
+          <div class="mb-4"><h4 class="fw-bold text-dark mb-1">🌾 Manajemen Bahan Baku & Stok Gudang</h4><p class="text-muted small">Kelola stok bahan mentah dan lakukan restock terintegrasi kas.</p></div>
+
+          <div class="row g-4">
+            <div class="col-lg-4">
+              <div class="card p-4 h-100">
+                <h5 class="fw-bold mb-3 text-dark">➕ Tambah Bahan Baku Baru</h5>
+                <form id="add-ingredient-form" onsubmit="handleAddNewIngredient(event)">
+                  <div class="mb-3"><label class="form-label">Nama Bahan Baku</label><input type="text" class="form-control" id="new-ing-name" required placeholder="Contoh: Biji Kopi Arabika"></div>
+                  <div class="mb-3"><label class="form-label">Stok Awal</label><input type="number" class="form-control" id="new-ing-stock" required placeholder="1000" value="1000"></div>
+                  <div class="mb-3"><label class="form-label">Satuan</label>
+                    <select class="form-select" id="new-ing-unit"><option value="Gram">Gram (g)</option><option value="ml">Mililiter (ml)</option><option value="Pcs">Pcs / Buah</option><option value="Pack">Pack / Bungkus</option><option value="Botol">Botol</option></select>
+                  </div>
+                  <div class="mb-4"><label class="form-label">Harga Beli / Modal Satuan (Rp)</label><input type="number" class="form-control" id="new-ing-price" required placeholder="150" value="150"></div>
+                  <button type="submit" class="btn btn-success-custom w-100 shadow-sm">Simpan Bahan Baku</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="col-lg-8">
+              <div class="card p-4 h-100">
+                <h5 class="fw-bold mb-3 text-dark">📋 Daftar Stok Bahan Baku Gudang</h5>
+                <div class="table-responsive" style="max-height:480px; overflow-y:auto;">
+                  <table class="table table-hover align-middle"><thead><tr><th>Nama Bahan</th><th class="text-center">Stok Tersedia</th><th>Satuan</th><th>Estimasi Nilai</th><th class="text-end">Aksi</th></tr></thead>
+                    <tbody id="admin-ingredient-list"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FINANCE CONTENT -->
+        <div class="tab-pane fade" id="finance-content" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div><h4 class="fw-bold text-dark mb-1">Keuangan, Buku Kas & Laporan</h4><p class="text-muted small mb-0">Catat pengeluaran, suntikan modal, pantau saldo kas kontinu, serta lihat rekap.</p></div>
+            <ul class="nav nav-pills sub-nav-pills gap-1" id="financeSubTab" role="tablist">
+              <li class="nav-item" role="presentation"><button class="nav-link active" id="sub-kas-tab" data-bs-toggle="pill" data-bs-target="#sub-kas-content" type="button" role="tab">📖 Buku Kas</button></li>
+              <li class="nav-item" role="presentation"><button class="nav-link" id="sub-daily-tab" data-bs-toggle="pill" data-bs-target="#sub-daily-content" type="button" role="tab">📅 Lap. Harian</button></li>
+              <li class="nav-item" role="presentation"><button class="nav-link" id="sub-monthly-tab" data-bs-toggle="pill" data-bs-target="#sub-monthly-content" type="button" role="tab">📈 Lap. Bulanan</button></li>
+              <li class="nav-item" role="presentation"><button class="nav-link" id="sub-yearly-tab" data-bs-toggle="pill" data-bs-target="#sub-yearly-content" type="button" role="tab">📑 Lap. Tahunan</button></li>
+            </ul>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-lg-4">
+              <div class="card p-4 mb-4">
+                <h5 class="fw-bold mb-3 text-dark">💸 Catat Pengeluaran</h5>
+                <form id="add-expense-form" onsubmit="handleAddExpense(event)">
+                  <div class="mb-3"><label class="form-label">Keterangan Biaya</label><input type="text" class="form-control" id="expense-desc" required placeholder="Contoh: Biji Kopi & Susu UHT"></div>
+                  <div class="mb-4"><label class="form-label">Jumlah Nominal (Rp)</label><input type="number" class="form-control" id="expense-amount" required placeholder="150000"></div>
+                  <button type="submit" class="btn btn-outline-danger w-100 shadow-sm fw-semibold" style="border-radius:10px;padding:11px;">Simpan Pengeluaran</button>
+                </form>
+              </div>
+
+              <div class="card p-4">
+                <h5 class="fw-bold mb-3 text-dark">💰 Suntikan Modal</h5>
+                <form id="add-capital-form" onsubmit="handleAddCapital(event)">
+                  <div class="mb-3"><label class="form-label">Keterangan Modal</label><input type="text" class="form-control" id="capital-desc" required placeholder="Contoh: Tambahan Modal Owner"></div>
+                  <div class="mb-4"><label class="form-label">Jumlah Nominal (Rp)</label><input type="number" class="form-control" id="capital-amount" required placeholder="1000000"></div>
+                  <button type="submit" class="btn btn-success-custom w-100 shadow-sm fw-semibold">Simpan Suntikan Modal</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="col-lg-8">
+              <div class="card p-4 h-100">
+                <div class="tab-content" id="financeSubContent">
+                  
+                  <!-- BUKU KAS -->
+                  <div class="tab-pane fade show active" id="sub-kas-content" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                      <h5 class="fw-bold mb-0 text-dark">📖 Buku Kas & Saldo Akumulatif</h5>
+                      <div class="d-flex align-items-center gap-2">
+                        <button class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-medium" onclick="printFinancialReport('kas')">🖨️ Cetak Buku Kas</button>
+                        <span class="badge bg-purple bg-opacity-10 text-purple border border-purple px-3 py-1 fw-bold" style="color:#7c3aed;background-color:#f5f3ff;">Saldo Saat Ini: <span id="badge-current-balance">Rp 0</span></span>
+                      </div>
+                    </div>
+                    <div class="table-responsive" style="max-height:520px; overflow-y:auto;">
+                      <table class="table table-hover align-middle"><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="text-success">Masuk</th><th class="text-danger">Keluar</th><th class="text-primary">Saldo</th><th class="text-end">Aksi</th></tr></thead>
+                        <tbody id="admin-kas-list"><tr><td colspan="6" class="text-center text-muted py-3 small">Belum ada data kas.</td></tr></tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- LAPORAN HARIAN -->
+                  <div class="tab-pane fade" id="sub-daily-content" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <h5 class="fw-bold mb-3 text-dark mb-0">📅 Laporan Keuangan Harian</h5>
+                      <button class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-medium" onclick="printFinancialReport('daily')">🖨️ Cetak Lap. Harian</button>
+                    </div>
+                    <div class="table-responsive" style="max-height:520px; overflow-y:auto;">
+                      <table class="table table-hover align-middle"><thead><tr><th>Tanggal</th><th class="text-success">Pemasukan</th><th class="text-danger">Pengeluaran</th><th class="text-primary">Kas Bersih</th><th class="text-dark">Saldo Akhir</th></tr></thead>
+                        <tbody id="daily-report-list"><tr><td colspan="5" class="text-center text-muted py-3">Belum ada data harian.</td></tr></tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- LAPORAN BULANAN -->
+                  <div class="tab-pane fade" id="sub-monthly-content" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <h5 class="fw-bold mb-3 text-dark mb-0">📈 Laporan Keuangan Bulanan</h5>
+                      <button class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-medium" onclick="printFinancialReport('monthly')">🖨️ Cetak Lap. Bulanan</button>
+                    </div>
+                    <div class="table-responsive" style="max-height:520px; overflow-y:auto;">
+                      <table class="table table-hover align-middle"><thead><tr><th>Bulan</th><th class="text-success">Pemasukan</th><th class="text-danger">Pengeluaran</th><th class="text-primary">Kas Bersih</th><th class="text-dark">Saldo Akhir</th></tr></thead>
+                        <tbody id="monthly-report-list"><tr><td colspan="5" class="text-center text-muted py-3">Belum ada data bulanan.</td></tr></tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- LAPORAN TAHUNAN -->
+                  <div class="tab-pane fade" id="sub-yearly-content" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <h5 class="fw-bold mb-3 text-dark mb-0">📑 Laporan Keuangan Tahunan</h5>
+                      <button class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-medium" onclick="printFinancialReport('yearly')">🖨️ Cetak Lap. Tahunan</button>
+                    </div>
+                    <div class="table-responsive" style="max-height:520px; overflow-y:auto;">
+                      <table class="table table-hover align-middle"><thead><tr><th>Tahun</th><th class="text-success">Pemasukan</th><th class="text-danger">Pengeluaran</th><th class="text-primary">Kas Bersih</th><th class="text-dark">Saldo Akhir</th></tr></thead>
+                        <tbody id="yearly-report-list"><tr><td colspan="5" class="text-center text-muted py-3">Belum ada data tahunan.</td></tr></tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold mb-0 text-dark">📝 Riwayat Transaksi Penjualan Kasir</h5>
+              <button class="btn btn-outline-danger btn-sm px-3 rounded-pill fw-medium" onclick="clearTransactions()">Hapus Riwayat Penjualan</button>
+            </div>
+            <div class="table-responsive" style="max-height:260px; overflow-y:auto;">
+              <table class="table table-hover align-middle"><thead><tr><th>Waktu</th><th>Item Terjual</th><th>Metode</th><th>Total</th><th class="text-end">Aksi</th></tr></thead>
+                <tbody id="admin-trx-list"><tr><td colspan="5" class="text-center text-muted py-3">Belum ada transaksi.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCOUNT CONTENT -->
+        <div class="tab-pane fade" id="account-content" role="tabpanel">
+          <div class="mb-4"><h4 class="fw-bold text-dark mb-1">👤 Manajemen Akun Pengguna</h4><p class="text-muted small">Tambah, ubah, atau hapus akun Admin dan Kasir yang dapat login ke sistem.</p></div>
+
+          <div class="row g-4">
+            <div class="col-lg-4">
+              <div class="card p-4 h-100">
+                <h5 class="fw-bold mb-3 text-dark">➕ Tambah Akun Baru</h5>
+                <form id="add-user-form" onsubmit="handleAddNewUser(event)">
+                  <div class="mb-3"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control" id="new-user-name" required placeholder="Contoh: Budi Santoso"></div>
+                  <div class="mb-3"><label class="form-label">Username</label><input type="text" class="form-control" id="new-user-username" required placeholder="Contoh: budi"></div>
+                  <div class="mb-3"><label class="form-label">Password</label><input type="password" class="form-control" id="new-user-password" required placeholder="Minimal 4 karakter"></div>
+                  <div class="mb-4"><label class="form-label">Peran (Role)</label>
+                    <select class="form-select" id="new-user-role"><option value="kasir">Kasir</option><option value="admin">Admin</option></select>
+                  </div>
+                  <button type="submit" class="btn btn-success-custom w-100 shadow-sm">Simpan Akun Baru</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="col-lg-8">
+              <div class="card p-4 h-100">
+                <h5 class="fw-bold mb-3 text-dark">📋 Daftar Akun Pengguna</h5>
+                <div class="table-responsive" style="max-height:480px; overflow-y:auto;">
+                  <table class="table table-hover align-middle"><thead><tr><th>Nama</th><th>Username</th><th>Peran</th><th class="text-end">Aksi</th></tr></thead>
+                    <tbody id="admin-user-list"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Modals (shared) -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius:16px;">
+          <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+            <h5 class="modal-title fw-bold text-dark">✏️ Edit Akun Pengguna</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-4">
+            <form id="edit-user-form" onsubmit="handleUpdateUser(event)">
+              <input type="hidden" id="edit-user-id">
+              <div class="mb-3"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control" id="edit-user-name" required></div>
+              <div class="mb-3"><label class="form-label">Username</label><input type="text" class="form-control" id="edit-user-username" required></div>
+              <div class="mb-3"><label class="form-label">Password Baru (kosongkan jika tidak diubah)</label><input type="password" class="form-control" id="edit-user-password" placeholder="••••••••"></div>
+              <div class="mb-4"><label class="form-label">Peran (Role)</label><select class="form-select" id="edit-user-role"><option value="kasir">Kasir</option><option value="admin">Admin</option></select></div>
+              <button type="submit" class="btn btn-success-custom w-100 shadow-sm">Simpan Perubahan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editMenuModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius:16px;">
+          <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+            <h5 class="modal-title fw-bold text-dark">✏️ Edit Menu & Stok</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-4">
+            <form id="edit-menu-form" onsubmit="handleUpdateMenu(event)">
+              <input type="hidden" id="edit-menu-id">
+              <div class="mb-3"><label class="form-label">Nama Menu</label><input type="text" class="form-control" id="edit-menu-name" required></div>
+              <div class="mb-3"><label class="form-label">Kategori</label><select class="form-select" id="edit-menu-category"><option value="ice-coffee">Ice Coffee</option><option value="americano">Americano</option><option value="non-coffee">Non Coffee</option></select></div>
+              <div class="row">
+                <div class="col-md-6 mb-3"><label class="form-label">Harga (Rp)</label><input type="number" class="form-control" id="edit-menu-price" required></div>
+                <div class="col-md-6 mb-3"><label class="form-label">Jumlah Stok</label><input type="number" class="form-control" id="edit-menu-stock" required></div>
+              </div>
+              <div class="mb-4"><label class="form-label">Ganti Gambar (Opsional)</label><input type="file" class="form-control" id="edit-menu-image-file" accept="image/*"></div>
+              <button type="submit" class="btn btn-success-custom w-100 shadow-sm">Simpan Perubahan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editIngredientModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius:16px;">
+          <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+            <h5 class="modal-title fw-bold text-dark">✏️ Edit Bahan Baku</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-4">
+            <form id="edit-ingredient-form" onsubmit="handleUpdateIngredient(event)">
+              <input type="hidden" id="edit-ing-id">
+              <div class="mb-3"><label class="form-label">Nama Bahan Baku</label><input type="text" class="form-control" id="edit-ing-name" required></div>
+              <div class="row">
+                <div class="col-md-6 mb-3"><label class="form-label">Jumlah Stok</label><input type="number" class="form-control" id="edit-ing-stock" required></div>
+                <div class="col-md-6 mb-3"><label class="form-label">Satuan</label><select class="form-select" id="edit-ing-unit"><option value="Gram">Gram (g)</option><option value="ml">Mililiter (ml)</option><option value="Pcs">Pcs / Buah</option><option value="Pack">Pack / Bungkus</option><option value="Botol">Botol</option></select></div>
+              </div>
+              <div class="mb-4"><label class="form-label">Harga Beli / Modal Satuan (Rp)</label><input type="number" class="form-control" id="edit-ing-price" required></div>
+              <button type="submit" class="btn btn-success-custom w-100 shadow-sm">Simpan Perubahan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =========== SCRIPTS COMBINED ============ -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* ========= SHARED DATA / HELPERS ========== */
+
+    const defaultMenu = [
+      { id: 1, name: 'Kopi Susu Gula Aren', price: 18000, category: 'ice-coffee', image: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=300&auto=format&fit=crop&q=60', stock: 40 },
+      { id: 2, name: 'Es Kopi Pandan', price: 20000, category: 'ice-coffee', image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=300&auto=format&fit=crop&q=60', stock: 35 },
+      { id: 3, name: 'Es Kopi Regal', price: 22000, category: 'ice-coffee', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=300&auto=format&fit=crop&q=60', stock: 25 },
+      { id: 4, name: 'Americano Regular', price: 15000, category: 'americano', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=300&auto=format&fit=crop&q=60', stock: 50 },
+      { id: 5, name: 'Americano Large', price: 22000, category: 'americano', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300&auto=format&fit=crop&q=60', stock: 30 },
+      { id: 6, name: 'Ice Lychee Americano', price: 25000, category: 'americano', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300&auto=format&fit=crop&q=60', stock: 20 },
+      { id: 7, name: 'Matcha Latte', price: 24000, category: 'non-coffee', image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300&auto=format&fit=crop&q=60', stock: 45 },
+      { id: 8, name: 'Chocolate Signature', price: 23000, category: 'non-coffee', image: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?w=300&auto=format&fit=crop&q=60', stock: 40 },
+      { id: 9, name: 'Es Teh Leci', price: 15000, category: 'non-coffee', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300&auto=format&fit=crop&q=60', stock: 60 }
+    ];
+
+    const defaultUsers = [
+      { id: 1, name: 'Administrator', username: 'admin', password: 'admin123', role: 'admin' },
+      { id: 2, name: 'Staff Kasir', username: 'kasir', password: 'kasir123', role: 'kasir' }
+    ];
+
+    const defaultIngredients = [
+      { id: 1, name: 'Biji Kopi Robusta/Arabica', stock: 2000, unit: 'Gram', price: 150 },
+      { id: 2, name: 'Susu UHT Full Cream', stock: 15, unit: 'Botol', price: 18000 },
+      { id: 3, name: 'Sirup Gula Aren', stock: 5, unit: 'Botol', price: 35000 },
+      { id: 4, name: 'Cup Plastik 16oz', stock: 250, unit: 'Pcs', price: 400 },
+      { id: 5, name: 'Tutup Cup (Lid)', stock: 300, unit: 'Pcs', price: 200 }
+    ];
+
+    function formatRupiah(angka) {
+      return 'Rp ' + angka.toLocaleString('id-ID');
+    }
+
+    function getMenuList() {
+      let stored = localStorage.getItem('three4five_menu');
+      if (!stored) { localStorage.setItem('three4five_menu', JSON.stringify(defaultMenu)); return defaultMenu.slice(); }
+      return JSON.parse(stored);
+    }
+    function getIngredientList() {
+      let stored = localStorage.getItem('three4five_ingredients');
+      if (!stored) { localStorage.setItem('three4five_ingredients', JSON.stringify(defaultIngredients)); return defaultIngredients.slice(); }
+      return JSON.parse(stored);
+    }
+    function getUserList() {
+      let stored = localStorage.getItem('three4five_users');
+      if (!stored) { localStorage.setItem('three4five_users', JSON.stringify(defaultUsers)); return defaultUsers.slice(); }
+      return JSON.parse(stored);
+    }
+    function saveUserList(list) { localStorage.setItem('three4five_users', JSON.stringify(list)); }
+    function getExpenseList() { let stored = localStorage.getItem('three4five_expenses'); return stored ? JSON.parse(stored) : []; }
+    function getCapitalList() { let stored = localStorage.getItem('three4five_capital'); return stored ? JSON.parse(stored) : []; }
+
+    /* ========= NAVIGATION & SESSION HELPERS ========== */
+    function showPage(id) {
+      document.querySelectorAll('main[id^="page-"]').forEach(el => el.classList.add('hidden'));
+      const el = document.getElementById('page-' + id);
+      if (el) el.classList.remove('hidden');
+    }
+
+    function navigateTo(page) {
+      location.hash = page;
+      route();
+    }
+
+    function logout() {
+      localStorage.removeItem('three4five_session');
+      navigateTo('login');
+    }
+
+    function route() {
+      const hash = (location.hash || '#login').replace('#','');
+      if (hash === 'admin') {
+        showPage('admin');
+        loadAdminDashboard();
+      } else if (hash === 'kasir') {
+        showPage('kasir');
+        checkKasirSession();
+        renderMenu();
+      } else {
+        showPage('login');
+        localStorage.removeItem('three4five_session');
+      }
+    }
+
+    window.addEventListener('hashchange', route);
+    window.addEventListener('load', () => {
+      if (location.hash) route(); else route();
+    });
+
+    /* ========= LOGIN HANDLER ========== */
+    function handleLogin(event) {
+      event.preventDefault();
+      let user = document.getElementById('login-username').value.trim().toLowerCase();
+      let pass = document.getElementById('login-password').value;
+
+      let userList = getUserList();
+      let found = userList.find(u => u.username.toLowerCase() === user && u.password === pass);
+
+      if (found) {
+        localStorage.setItem('three4five_session', JSON.stringify({ role: found.role, name: found.name, username: found.username }));
+        navigateTo(found.role === 'admin' ? 'admin' : 'kasir');
+      } else {
+        alert('Username atau Password salah! Silakan cek kembali.');
+      }
+    }
+
+    /* ========= KASIR FUNCTIONS ========== */
+    const API_URL = "https://script.google.com/macros/s/AKfycbyq7kqAWjqrlwrHpdOUrr_ENRp4HE7wLf0STBFM-F42BkKNOoo99eJ1YlTFApGaBhFh/exec";
+
+    function kirimKeGoogleSheets(tanggalStr, keteranganStr, masukNominal, metodeBayar) {
+      let dataKirim = { tanggal: tanggalStr, keterangan: keteranganStr, masuk: masukNominal, keluar: 0, metode: metodeBayar };
+      fetch(API_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(dataKirim) })
+        .then(() => console.log("Tersinkron ke Google Sheets"))
+        .catch(err => console.error("Gagal sinkron ke database online:", err));
+    }
+
+    function checkKasirSession() {
+      let session = JSON.parse(localStorage.getItem('three4five_session') || '{}');
+      if (!session.role) {
+        alert('Silakan login terlebih dahulu!');
+        navigateTo('login');
+        return;
+      }
+      if (session.role === 'admin') {
+        document.getElementById('nav-admin-link').style.display = 'inline-block';
+      } else {
+        document.getElementById('nav-admin-link').style.display = 'none';
+      }
+    }
+
+    let cart = [];
+    let currentCategory = 'all';
+    let paymentModalInstance = null;
+
+    function renderMenu(category = 'all') {
+      let menuList = getMenuList();
+      let grid = document.getElementById('menu-grid');
+      grid.innerHTML = '';
+      let filtered = category === 'all' ? menuList : menuList.filter(m => m.category === category);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-12 text-center text-muted py-5">Tidak ada menu dalam kategori ini.</div>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        let stock = item.stock !== undefined ? item.stock : 50;
+        let isHabis = stock <= 0;
+        let cardStyle = isHabis ? 'opacity: 0.6;' : '';
+        let buttonAction = isHabis ? 'disabled' : `onclick="addToCart(${item.id})"`;
+        let stockBadge = isHabis ? `<span class="badge bg-danger">Habis</span>` : `<span class="badge bg-success bg-opacity-10 text-success">Stok: ${stock}</span>`;
+
+        grid.innerHTML += `
+          <div class="col-md-4 col-sm-6">
+            <div class="card menu-card h-100 bg-white" style="${cardStyle}">
+              <img src="${item.image}" class="menu-img" alt="${item.name}">
+              <div class="card-body d-flex flex-column justify-content-between p-3">
+                <div>
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="fw-bold mb-0 text-dark">${item.name}</h6>
+                    ${stockBadge}
+                  </div>
+                  <span class="text-success fw-semibold small">${formatRupiah(item.price)}</span>
+                </div>
+                <button class="btn btn-outline-success btn-sm mt-3 w-100 rounded-pill fw-medium" ${buttonAction}>
+                  ${isHabis ? 'Stok Habis' : '+ Tambah'}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      renderCart();
+    }
+
+    function filterCategory(cat, element) {
+      currentCategory = cat;
+      document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+      renderMenu(cat);
+    }
+
+    function addToCart(id) {
+      let menuList = getMenuList();
+      let item = menuList.find(m => m.id === id);
+      if (!item || item.stock <= 0) return;
+      let existing = cart.find(c => c.id === id);
+      let currentQtyInCart = existing ? existing.qty : 0;
+      if (currentQtyInCart + 1 > item.stock) { alert("Stok produk tidak mencukupi!"); return; }
+      if (existing) existing.qty++; else cart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
+      renderCart();
+    }
+
+    function updateQty(id, change) {
+      let menuList = getMenuList();
+      let item = menuList.find(m => m.id === id);
+      let existing = cart.find(c => c.id === id);
+      if (!existing) return;
+      let newQty = existing.qty + change;
+      if (newQty > item.stock) { alert("Stok produk tidak mencukupi!"); return; }
+      if (newQty <= 0) cart = cart.filter(c => c.id !== id); else existing.qty = newQty;
+      renderCart();
+    }
+
+    function renderCart() {
+      let tbody = document.getElementById('cart-list');
+      tbody.innerHTML = '';
+      if (cart.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4 small">Keranjang masih kosong.</td></tr>`;
+        document.getElementById('subtotal-text').innerText = formatRupiah(0);
+        document.getElementById('total-text').innerText = formatRupiah(0);
+        return;
+      }
+      let subtotal = 0;
+      cart.forEach(item => {
+        let totalItem = item.price * item.qty;
+        subtotal += totalItem;
+        tbody.innerHTML += `
+          <tr>
+            <td style="width:45%;">
+              <div class="small fw-semibold text-dark">${item.name}</div>
+              <div class="text-muted" style="font-size:0.75rem;">${formatRupiah(item.price)}</div>
+            </td>
+            <td style="width:25%;">
+              <div class="input-group input-group-sm">
+                <button class="btn btn-outline-secondary px-1 py-0" onclick="updateQty(${item.id}, -1)">-</button>
+                <span class="input-group-text bg-light border-0 px-2 small">${item.qty}</span>
+                <button class="btn btn-outline-secondary px-1 py-0" onclick="updateQty(${item.id}, 1)">+</button>
+              </div>
+            </td>
+            <td class="text-end small fw-semibold text-dark" style="width:30%;">${formatRupiah(totalItem)}</td>
+          </tr>
+        `;
+      });
+      document.getElementById('subtotal-text').innerText = formatRupiah(subtotal);
+      document.getElementById('total-text').innerText = formatRupiah(subtotal);
+    }
+
+    function openPaymentModal() {
+      if (cart.length === 0) { alert("Keranjang masih kosong!"); return; }
+      let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      document.getElementById('modal-total-text').innerText = formatRupiah(subtotal);
+      document.getElementById('cash-received').value = '';
+      document.getElementById('change-text').innerText = formatRupiah(0);
+
+      let method = document.getElementById('payment-method').value;
+      if (method === 'QRIS') {
+        document.getElementById('cash-input-container').style.display = 'none';
+        document.getElementById('change-container').style.display = 'none';
+      } else {
+        document.getElementById('cash-input-container').style.display = 'block';
+        document.getElementById('change-container').style.display = 'block';
+      }
+
+      if (!paymentModalInstance) paymentModalInstance = new bootstrap.Modal(document.getElementById('paymentModal'));
+      paymentModalInstance.show();
+    }
+
+    function calculateChange() {
+      let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      let cash = parseInt(document.getElementById('cash-received').value) || 0;
+      let change = cash - subtotal;
+      document.getElementById('change-text').innerText = change >= 0 ? formatRupiah(change) : 'Uang kurang';
+    }
+
+    function finalizeTransaction() {
+      let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      let method = document.getElementById('payment-method').value;
+      let cashReceived = 0, changeAmount = 0;
+      if (method === 'Tunai') {
+        cashReceived = parseInt(document.getElementById('cash-received').value) || 0;
+        if (cashReceived < subtotal) { alert("Jumlah uang tunai kurang!"); return; }
+        changeAmount = cashReceived - subtotal;
+      }
+
+      let menuList = getMenuList();
+      cart.forEach(cartItem => {
+        let menuItem = menuList.find(m => m.id === cartItem.id);
+        if (menuItem) {
+          menuItem.stock = (menuItem.stock !== undefined ? menuItem.stock : 50) - cartItem.qty;
+          if (menuItem.stock < 0) menuItem.stock = 0;
+        }
+      });
+      localStorage.setItem('three4five_menu', JSON.stringify(menuList));
+
+      let now = new Date();
+      let dateStr = now.toISOString().slice(0,10);
+      let timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      let fullDateStr = dateStr + ' ' + timeStr;
+      let itemsSummary = "Penjualan: " + cart.map(i => `${i.name} (x${i.qty})`).join(', ');
+
+      let transactions = JSON.parse(localStorage.getItem('three4five_trx') || '[]');
+      let newTrx = { date: fullDateStr, items: [...cart], method: method, total: subtotal, cashReceived: cashReceived, change: changeAmount, timestamp: now.getTime() };
+      transactions.unshift(newTrx);
+      localStorage.setItem('three4five_trx', JSON.stringify(transactions));
+
+      kirimKeGoogleSheets(fullDateStr, itemsSummary, subtotal, method);
+
+      if (paymentModalInstance) paymentModalInstance.hide();
+
+      cart = [];
+      renderCart();
+      renderMenu(currentCategory);
+
+      printReceipt(newTrx);
+    }
+
+    /* ========= FITUR CETAK STRUK & DOKUMEN LAPORAN ========== */
+    function printReceipt(trx) {
+      let itemsRows = trx.items.map(item => {
+        let lineTotal = item.price * item.qty;
+        return `
+          <tr><td colspan="3" style="padding-top:6px;">${item.name}</td></tr>
+          <tr>
+            <td style="width:34%;">${item.qty} x ${item.price.toLocaleString('id-ID')}</td>
+            <td style="width:32%;"></td>
+            <td style="width:34%; text-align:right;">${lineTotal.toLocaleString('id-ID')}</td>
+          </tr>`;
+      }).join('');
+
+      let cashRows = '';
+      if (trx.method === 'Tunai') {
+        cashRows = `
+          <tr><td colspan="2">Tunai</td><td style="text-align:right;">Rp ${(trx.cashReceived || 0).toLocaleString('id-ID')}</td></tr>
+          <tr><td colspan="2">Kembalian</td><td style="text-align:right;">Rp ${(trx.change || 0).toLocaleString('id-ID')}</td></tr>`;
+      }
+
+      let receiptHtml = `
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+          <meta charset="UTF-8">
+          <title>Struk Three4Five</title>
+          <style>
+            @page { margin: 0; }
+            body { font-family: 'Courier New', monospace; font-size: 12px; width: 280px; margin: 0 auto; padding: 12px; color: #000; }
+            h2 { text-align:center; margin:0 0 2px 0; font-size:16px; }
+            p.sub { text-align:center; margin:0 0 10px 0; font-size:11px; }
+            hr { border:none; border-top:1px dashed #000; margin:8px 0; }
+            table { width:100%; border-collapse:collapse; font-size:12px; }
+            .total-row td { font-weight:bold; padding-top:6px; }
+            .footer { text-align:center; margin-top:12px; font-size:11px; }
+          </style>
+        </head>
+        <body>
+          <h2>Three4Five</h2>
+          <p class="sub">Sistem Point of Sales</p>
+          <hr>
+          <div>Tanggal: ${trx.date}</div>
+          <div>Metode: ${trx.method}</div>
+          <hr>
+          <table>${itemsRows}</table>
+          <hr>
+          <table>
+            <tr class="total-row"><td colspan="2">TOTAL</td><td style="text-align:right;">Rp ${trx.total.toLocaleString('id-ID')}</td></tr>
+            ${cashRows}
+          </table>
+          <hr>
+          <p class="footer">Terima kasih atas kunjungan Anda!<br>Selamat menikmati ☕</p>
+          <script>window.onload = function() { window.print(); setTimeout(function(){ window.close(); }, 300); };<\/script>
+        </body>
+        </html>`;
+
+      let printWindow = window.open('', '_blank', 'width=340,height=600');
+      if (!printWindow) { alert('Popup diblokir oleh browser.'); return; }
+      printWindow.document.open();
+      printWindow.document.write(receiptHtml);
+      printWindow.document.close();
+    }
+
+    function printReceiptByIndex(idx) {
+      let transactions = JSON.parse(localStorage.getItem('three4five_trx') || '[]');
+      let trx = transactions[idx];
+      if (trx) printReceipt(trx);
+    }
+
+    // Fungsi Cetak Laporan Keuangan (Buku Kas, Harian, Bulanan, Tahunan)
+    function printFinancialReport(type) {
+      let title = "";
+      let tableContent = "";
+      let transactions = JSON.parse(localStorage.getItem('three4five_trx') || '[]');
+      let expenses = getExpenseList();
+      let capitals = getCapitalList();
+      let now = new Date();
+      let todayDateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+
+      if (type === 'kas') {
+        title = "BUKU KAS AKUMULATIF";
+        let ledger = [];
+        transactions.forEach((trx, idx) => { ledger.push({ date: trx.date, desc: 'Penjualan Kasir (' + trx.items.map(i => i.name).join(', ') + ')', in: trx.total, out: 0, time: trx.timestamp || 0 }); });
+        capitals.forEach(cap => { ledger.push({ date: cap.date || todayDateStr, desc: 'Suntikan Modal: ' + cap.desc, in: cap.amount, out: 0, time: cap.timestamp || 0 }); });
+        expenses.forEach(exp => { ledger.push({ date: exp.date || todayDateStr, desc: 'Pengeluaran: ' + exp.desc, in: 0, out: exp.amount, time: exp.timestamp || 0 }); });
+        ledger.sort((a,b) => a.time - b.time);
+
+        let runningBalance = 0;
+        let rows = ledger.map(item => {
+          runningBalance += (item.in - item.out);
+          return `<tr>
+            <td>${item.date}</td>
+            <td>${item.desc}</td>
+            <td style="text-align:right; color:green;">${item.in > 0 ? item.in.toLocaleString('id-ID') : '-'}</td>
+            <td style="text-align:right; color:red;">${item.out > 0 ? item.out.toLocaleString('id-ID') : '-'}</td>
+            <td style="text-align:right; font-weight:bold;">${runningBalance.toLocaleString('id-ID')}</td>
+          </tr>`;
+        }).join('');
+
+        tableContent = `
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Keterangan</th>
+              <th style="text-align:right;">Masuk (Rp)</th>
+              <th style="text-align:right;">Keluar (Rp)</th>
+              <th style="text-align:right;">Saldo (Rp)</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="5" style="text-align:center;">Tidak ada data</td></tr>'}</tbody>`;
+      
+      } else if (type === 'daily') {
+        title = "LAPORAN KEUANGAN HARIAN";
+        let ledger = getFullLedgerForReports(transactions, expenses, capitals, todayDateStr);
+        let dailyMap = {};
+        ledger.forEach(item => { if (!dailyMap[item.date]) dailyMap[item.date] = { in:0, out:0 }; dailyMap[item.date].in += item.in; dailyMap[item.date].out += item.out; });
+        let runningDailyBalance = 0;
+        let rows = Object.keys(dailyMap).map(d => {
+          let inc = dailyMap[d].in; let out = dailyMap[d].out; let net = inc - out; runningDailyBalance += net;
+          return `<tr>
+            <td>${d}</td>
+            <td style="text-align:right; color:green;">${inc.toLocaleString('id-ID')}</td>
+            <td style="text-align:right; color:red;">${out.toLocaleString('id-ID')}</td>
+            <td style="text-align:right;">${net.toLocaleString('id-ID')}</td>
+            <td style="text-align:right; font-weight:bold;">${runningDailyBalance.toLocaleString('id-ID')}</td>
+          </tr>`;
+        }).join('');
+
+        tableContent = `
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th style="text-align:right;">Pemasukan (Rp)</th>
+              <th style="text-align:right;">Pengeluaran (Rp)</th>
+              <th style="text-align:right;">Kas Bersih (Rp)</th>
+              <th style="text-align:right;">Saldo Akhir (Rp)</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="5" style="text-align:center;">Tidak ada data</td></tr>'}</tbody>`;
+
+      } else if (type === 'monthly') {
+        title = "LAPORAN KEUANGAN BULANAN";
+        let ledger = getFullLedgerForReports(transactions, expenses, capitals, todayDateStr);
+        let monthlyMap = {};
+        ledger.forEach(item => {
+          let parts = item.date.split(' ');
+          let mKey = parts.length >= 3 ? `${parts[1]} ${parts[2]}` : item.date;
+          if (!monthlyMap[mKey]) monthlyMap[mKey] = { in:0, out:0 };
+          monthlyMap[mKey].in += item.in; monthlyMap[mKey].out += item.out;
+        });
+        let runningMonthlyBalance = 0;
+        let rows = Object.keys(monthlyMap).map(m => {
+          let inc = monthlyMap[m].in; let out = monthlyMap[m].out; let net = inc - out; runningMonthlyBalance += net;
+          return `<tr>
+            <td>${m}</td>
+            <td style="text-align:right; color:green;">${inc.toLocaleString('id-ID')}</td>
+            <td style="text-align:right; color:red;">${out.toLocaleString('id-ID')}</td>
+            <td style="text-align:right;">${net.toLocaleString('id-ID')}</td>
+            <td style="text-align:right; font-weight:bold;">${runningMonthlyBalance.toLocaleString('id-ID')}</td>
+          </tr>`;
+        }).join('');
+
+        tableContent = `
+          <thead>
+            <tr>
+              <th>Bulan</th>
+              <th style="text-align:right;">Pemasukan (Rp)</th>
+              <th style="text-align:right;">Pengeluaran (Rp)</th>
+              <th style="text-align:right;">Kas Bersih (Rp)</th>
+              <th style="text-align:right;">Saldo Akhir (Rp)</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="5" style="text-align:center;">Tidak ada data</td></tr>'}</tbody>`;
+
+      } else if (type === 'yearly') {
+        title = "LAPORAN KEUANGAN TAHUNAN";
+        let ledger = getFullLedgerForReports(transactions, expenses, capitals, todayDateStr);
+        let yearlyMap = {};
+        ledger.forEach(item => {
+          let parts = item.date.split(' ');
+          let yKey = parts.length >= 3 ? parts[2] : new Date().getFullYear().toString();
+          if (!yearlyMap[yKey]) yearlyMap[yKey] = { in:0, out:0 };
+          yearlyMap[yKey].in += item.in; yearlyMap[yKey].out += item.out;
+        });
+        let runningYearlyBalance = 0;
+        let rows = Object.keys(yearlyMap).map(y => {
+          let inc = yearlyMap[y].in; let out = yearlyMap[y].out; let net = inc - out; runningYearlyBalance += net;
+          return `<tr>
+            <td>${y}</td>
+            <td style="text-align:right; color:green;">${inc.toLocaleString('id-ID')}</td>
+            <td style="text-align:right; color:red;">${out.toLocaleString('id-ID')}</td>
+            <td style="text-align:right;">${net.toLocaleString('id-ID')}</td>
+            <td style="text-align:right; font-weight:bold;">${runningYearlyBalance.toLocaleString('id-ID')}</td>
+          </tr>`;
+        }).join('');
+
+        tableContent = `
+          <thead>
+            <tr>
+              <th>Tahun</th>
+              <th style="text-align:right;">Pemasukan (Rp)</th>
+              <th style="text-align:right;">Pengeluaran (Rp)</th>
+              <th style="text-align:right;">Kas Bersih (Rp)</th>
+              <th style="text-align:right;">Saldo Akhir (Rp)</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="5" style="text-align:center;">Tidak ada data</td></tr>'}</tbody>`;
+      }
+
+      let printHtml = `
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+          <meta charset="UTF-8">
+          <title>${title} - Three4Five</title>
+          <style>
+            body { font-family: Arial, sans-serif; font-size: 13px; color: #000; margin: 20px; }
+            h2 { text-align: center; margin-bottom: 5px; }
+            p.sub { text-align: center; margin-top: 0; font-size: 12px; color: #555; }
+            .meta { margin-bottom: 15px; font-size: 12px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { border: 1px solid #333; padding: 6px 10px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .footer { margin-top: 30px; text-align: right; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <h2>Three4Five - Cafe & POS</h2>
+          <p class="sub">${title}</p>
+          <div class="meta">Dicetak pada: ${new Date().toLocaleString('id-ID')}</div>
+          <table>${tableContent}</table>
+          <div class="footer">
+            <p>Mengetahui,</p>
+            <br><br>
+            <p><strong>Administrator / Owner</strong></p>
+          </div>
+          <script>window.onload = function() { window.print(); setTimeout(function(){ window.close(); }, 500); };<\/script>
+        </body>
+        </html>`;
+
+      let printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (!printWindow) { alert('Popup diblokir oleh browser. Izinkan popup untuk mencetak dokumen.'); return; }
+      printWindow.document.open();
+      printWindow.document.write(printHtml);
+      printWindow.document.close();
+    }
+
+    function getFullLedgerForReports(transactions, expenses, capitals, todayDateStr) {
+      let ledger = [];
+      transactions.forEach((trx) => { ledger.push({ date: trx.date.slice(0,10), desc: 'Penjualan', in: trx.total, out: 0, time: trx.timestamp || 0 }); });
+      capitals.forEach(cap => { ledger.push({ date: cap.date || todayDateStr, desc: 'Modal', in: cap.amount, out: 0, time: cap.timestamp || 0 }); });
+      expenses.forEach(exp => { ledger.push({ date: exp.date || todayDateStr, desc: 'Biaya', in: 0, out: exp.amount, time: exp.timestamp || 0 }); });
+      ledger.sort((a,b) => a.time - b.time);
+      return ledger;
+    }
+
+    /* ========= ADMIN FUNCTIONS ========== */
+
+    let editModalInstance = null;
+    let editIngredientModalInstance = null;
+
+    function checkAdminSession() {
+      let session = JSON.parse(localStorage.getItem('three4five_session') || '{}');
+      if (session.role !== 'admin') {
+        alert('Akses ditolak! Halaman ini khusus untuk Administrator.');
+        navigateTo(session.role === 'kasir' ? 'kasir' : 'login');
+      }
+    }
+
+    function loadAdminDashboard() {
+      checkAdminSession();
+      let transactions = JSON.parse(localStorage.getItem('three4five_trx') || '[]');
+      let expenses = getExpenseList();
+      let capitals = getCapitalList();
+
+      let totalRevenue = 0, totalExpense = 0;
+      let now = new Date();
+      let todayDateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+      document.getElementById('current-date-label').innerText = todayDateStr;
+
+      let dailyRev = 0, dailyTrxCount = 0, dailyItemsSold = 0;
+      let trxTbody = document.getElementById('admin-trx-list');
+      trxTbody.innerHTML = '';
+
+      if (transactions.length === 0) {
+        trxTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Belum ada transaksi.</td></tr>`;
+      } else {
+        transactions.forEach((trx, idx) => {
+          totalRevenue += trx.total;
+          if (trx.date.includes(todayDateStr)) {
+            dailyRev += trx.total; dailyTrxCount++; trx.items.forEach(i => { dailyItemsSold += i.qty; });
+          }
+          let itemSummary = trx.items.map(i => `${i.name} (${i.qty}x)`).join(', ');
+          trxTbody.innerHTML += `
+            <tr>
+              <td><small class="text-muted">${trx.date}</small></td>
+              <td><span class="small fw-medium">${itemSummary}</span></td>
+              <td><span class="badge bg-light text-dark border px-2 py-1">${trx.method}</span></td>
+              <td class="fw-semibold text-success">${formatRupiah(trx.total)}</td>
+              <td class="text-end"><button class="btn btn-outline-secondary btn-sm py-0 px-3 rounded-pill" onclick="printReceiptByIndex(${idx})">🖨️ Cetak</button></td>
+            </tr>
+          `;
+        });
+      }
+
+      expenses.forEach(exp => { totalExpense += exp.amount; });
+      let netProfit = totalRevenue - totalExpense;
+
+      let ledger = [];
+      transactions.forEach((trx, idx) => {
+        ledger.push({ date: trx.date, desc: 'Penjualan Kasir (' + trx.items.map(i => i.name).join(', ') + ')', in: trx.total, out: 0, time: trx.timestamp || 0, type: 'trx', originalIndex: idx });
+      });
+      capitals.forEach((cap, idx) => {
+        ledger.push({ date: cap.date || todayDateStr, desc: 'Suntikan Modal: ' + cap.desc, in: cap.amount, out: 0, time: cap.timestamp || 0, type: 'capital', originalIndex: idx });
+      });
+      expenses.forEach((exp, idx) => {
+        ledger.push({ date: exp.date || todayDateStr, desc: 'Pengeluaran: ' + exp.desc, in: 0, out: exp.amount, time: exp.timestamp || 0, type: 'expense', originalIndex: idx });
+      });
+
+      ledger.sort((a,b) => a.time - b.time);
+
+      let kasTbody = document.getElementById('admin-kas-list');
+      kasTbody.innerHTML = '';
+      let runningBalance = 0;
+
+      if (ledger.length === 0) {
+        kasTbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3 small">Belum ada data kas.</td></tr>`;
+      } else {
+        ledger.forEach(item => {
+          runningBalance += (item.in - item.out);
+          let deleteBtn = '';
+          if (item.type === 'expense' || item.type === 'capital') {
+            deleteBtn = `<button class="btn btn-outline-danger btn-sm py-0 px-2 rounded-pill" onclick="deleteLedgerItem('${item.type}', ${item.originalIndex})">Hapus</button>`;
+          } else { deleteBtn = `<span class="text-muted small">-</span>`; }
+
+          kasTbody.innerHTML += `
+            <tr>
+              <td><small class="text-muted">${item.date}</small></td>
+              <td><span class="small fw-medium">${item.desc}</span></td>
+              <td class="text-success small fw-medium">${item.in > 0 ? formatRupiah(item.in) : '-'}</td>
+              <td class="text-danger small fw-medium">${item.out > 0 ? formatRupiah(item.out) : '-'}</td>
+              <td class="text-primary small fw-bold">${formatRupiah(runningBalance)}</td>
+              <td class="text-end">${deleteBtn}</td>
+            </tr>
+          `;
+        });
+      }
+
+      document.getElementById('admin-total-revenue').innerText = formatRupiah(totalRevenue);
+      document.getElementById('admin-total-expense').innerText = formatRupiah(totalExpense);
+      document.getElementById('admin-net-profit').innerText = formatRupiah(netProfit);
+      document.getElementById('admin-current-balance').innerText = formatRupiah(runningBalance);
+      document.getElementById('badge-current-balance').innerText = formatRupiah(runningBalance);
+
+      document.getElementById('daily-revenue').innerText = formatRupiah(dailyRev);
+      document.getElementById('daily-trx-count').innerText = dailyTrxCount + " Trx";
+      document.getElementById('daily-items-sold').innerText = dailyItemsSold + " Porsi";
+
+      renderReports(ledger);
+      renderAdminMenuTable();
+      renderAdminIngredientTable();
+      renderAdminUserTable();
+    }
+
+    function deleteLedgerItem(type, index) {
+      let labelName = type === 'expense' ? 'pengeluaran' : 'suntikan modal';
+      if (confirm(`Apakah Anda yakin ingin menghapus data ${labelName} ini? Saldo dan laporan akan disesuaikan secara otomatis.`)) {
+        if (type === 'expense') {
+          let expenses = getExpenseList(); expenses.splice(index,1); localStorage.setItem('three4five_expenses', JSON.stringify(expenses));
+        } else if (type === 'capital') {
+          let capitals = getCapitalList(); capitals.splice(index,1); localStorage.setItem('three4five_capital', JSON.stringify(capitals));
+        }
+        loadAdminDashboard();
+        alert("Data kas berhasil dihapus dan saldo diperbarui!");
+      }
+    }
+
+    function renderReports(ledger) {
+      // Daily
+      let dailyMap = {};
+      ledger.forEach(item => { if (!dailyMap[item.date]) dailyMap[item.date] = { in:0, out:0 }; dailyMap[item.date].in += item.in; dailyMap[item.date].out += item.out; });
+      let dailyTbody = document.getElementById('daily-report-list'); dailyTbody.innerHTML = '';
+      let dailyDates = Object.keys(dailyMap); let runningDailyBalance = 0;
+      if (dailyDates.length === 0) dailyTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Belum ada data harian.</td></tr>`;
+      else dailyDates.forEach(d => { let inc = dailyMap[d].in; let out = dailyMap[d].out; let net = inc - out; runningDailyBalance += net; dailyTbody.innerHTML += `<tr><td><span class="fw-semibold small">${d}</span></td><td class="text-success small">${formatRupiah(inc)}</td><td class="text-danger small">${formatRupiah(out)}</td><td class="text-primary small fw-semibold">${formatRupiah(net)}</td><td class="text-dark small fw-bold">${formatRupiah(runningDailyBalance)}</td></tr>`; });
+
+      // Monthly
+      let monthlyMap = {};
+      ledger.forEach(item => {
+        let parts = item.date.split(' ');
+        let mKey = parts.length >= 3 ? `${parts[1]} ${parts[2]}` : item.date;
+        if (!monthlyMap[mKey]) monthlyMap[mKey] = { in:0, out:0 };
+        monthlyMap[mKey].in += item.in; monthlyMap[mKey].out += item.out;
+      });
+      let monthlyTbody = document.getElementById('monthly-report-list'); monthlyTbody.innerHTML = ''; let mKeys = Object.keys(monthlyMap); let runningMonthlyBalance = 0;
+      if (mKeys.length === 0) monthlyTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Belum ada data bulanan.</td></tr>`;
+      else mKeys.forEach(m => { let inc = monthlyMap[m].in; let out = monthlyMap[m].out; let net = inc - out; runningMonthlyBalance += net; monthlyTbody.innerHTML += `<tr><td><span class="fw-semibold small">${m}</span></td><td class="text-success small">${formatRupiah(inc)}</td><td class="text-danger small">${formatRupiah(out)}</td><td class="text-primary small fw-semibold">${formatRupiah(net)}</td><td class="text-dark small fw-bold">${formatRupiah(runningMonthlyBalance)}</td></tr>`; });
+
+      // Yearly
+      let yearlyMap = {};
+      ledger.forEach(item => {
+        let parts = item.date.split(' ');
+        let yKey = parts.length >= 3 ? parts[2] : new Date().getFullYear().toString();
+        if (!yearlyMap[yKey]) yearlyMap[yKey] = { in:0, out:0 };
+        yearlyMap[yKey].in += item.in; yearlyMap[yKey].out += item.out;
+      });
+      let yearlyTbody = document.getElementById('yearly-report-list'); yearlyTbody.innerHTML = ''; let yKeys = Object.keys(yearlyMap); let runningYearlyBalance = 0;
+      if (yKeys.length === 0) yearlyTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Belum ada data tahunan.</td></tr>`;
+      else yKeys.forEach(y => { let inc = yearlyMap[y].in; let out = yearlyMap[y].out; let net = inc - out; runningYearlyBalance += net; yearlyTbody.innerHTML += `<tr><td><span class="fw-semibold small">${y}</span></td><td class="text-success small">${formatRupiah(inc)}</td><td class="text-danger small">${formatRupiah(out)}</td><td class="text-primary small fw-semibold">${formatRupiah(net)}</td><td class="text-dark small fw-bold">${formatRupiah(runningYearlyBalance)}</td></tr>`; });
+    }
+
+    function renderAdminMenuTable() {
+      let menuList = getMenuList();
+      let menuTbody = document.getElementById('admin-menu-list'); menuTbody.innerHTML = '';
+      if (menuList.length === 0) { menuTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Belum ada menu.</td></tr>`; return; }
+      menuList.forEach(item => {
+        let currentStock = item.stock !== undefined ? item.stock : 50;
+        let stockBadge = currentStock > 0 ? `<span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1">${currentStock} Porsi</span>` : `<span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2 py-1">Habis</span>`;
+        menuTbody.innerHTML += `<tr><td><strong class="small text-dark">${item.name}</strong></td><td><span class="badge bg-light text-secondary border px-2 py-1">${item.category}</span></td><td class="small fw-semibold">${formatRupiah(item.price)}</td><td class="text-center">${stockBadge}</td><td class="text-end"><button class="btn btn-outline-primary btn-sm py-0 px-3 rounded-pill me-1" onclick="openEditModal(${item.id})">Edit</button><button class="btn btn-outline-danger btn-sm py-0 px-3 rounded-pill" onclick="deleteMenu(${item.id})">Hapus</button></td></tr>`;
+      });
+    }
+
+    function renderAdminIngredientTable() {
+      let ingList = getIngredientList();
+      let ingTbody = document.getElementById('admin-ingredient-list'); ingTbody.innerHTML = '';
+      if (ingList.length === 0) { ingTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Belum ada data bahan baku.</td></tr>`; return; }
+      ingList.forEach(ing => {
+        let estValue = ing.stock * ing.price;
+        let stockBadge = ing.stock > 0 ? `<span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1">${ing.stock}</span>` : `<span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2 py-1">Habis</span>`;
+        ingTbody.innerHTML += `<tr><td><strong class="small text-dark d-block">${ing.name}</strong><small class="text-muted">Modal: ${formatRupiah(ing.price)} / ${ing.unit}</small></td><td class="text-center">${stockBadge}</td><td><span class="small text-secondary fw-medium">${ing.unit}</span></td><td class="small fw-semibold text-primary">${formatRupiah(estValue)}</td><td class="text-end"><button class="btn btn-outline-success btn-sm py-0 px-2 rounded-pill me-1" onclick="restockIngredient(${ing.id})" title="Restock / Tambah Stok">+ Restock</button><button class="btn btn-outline-primary btn-sm py-0 px-2 rounded-pill me-1" onclick="openEditIngredientModal(${ing.id})">Edit</button><button class="btn btn-outline-danger btn-sm py-0 px-2 rounded-pill" onclick="deleteIngredient(${ing.id})">Hapus</button></td></tr>`;
+      });
+    }
+
+    function handleAddNewIngredient(event) {
+      event.preventDefault();
+      let name = document.getElementById('new-ing-name').value;
+      let stock = parseFloat(document.getElementById('new-ing-stock').value);
+      let unit = document.getElementById('new-ing-unit').value;
+      let price = parseInt(document.getElementById('new-ing-price').value);
+      let ingList = getIngredientList();
+      let newId = ingList.length > 0 ? Math.max(...ingList.map(i => i.id)) + 1 : 1;
+      ingList.push({ id: newId, name, stock, unit, price });
+      localStorage.setItem('three4five_ingredients', JSON.stringify(ingList));
+      document.getElementById('add-ingredient-form').reset();
+      document.getElementById('new-ing-stock').value = 1000;
+      document.getElementById('new-ing-price').value = 150;
+      renderAdminIngredientTable();
+      alert("Bahan baku baru berhasil ditambahkan!");
+    }
+
+    function restockIngredient(id) {
+      let ingList = getIngredientList();
+      let ing = ingList.find(i => i.id === id); if (!ing) return;
+      let addQtyStr = prompt(`Masukkan jumlah ${ing.name} yang ingin ditambah (${ing.unit}):`, "100"); if (!addQtyStr) return;
+      let addQty = parseFloat(addQtyStr); if (isNaN(addQty) || addQty <= 0) { alert("Jumlah tidak valid!"); return; }
+      let totalCost = addQty * ing.price;
+      let confirmBuy = confirm(`Total perkiraan biaya pembelian ${addQty} ${ing.unit} ${ing.name} adalah ${formatRupiah(totalCost)}. Catat otomatis sebagai pengeluaran di Buku Kas?`);
+      ing.stock += addQty; localStorage.setItem('three4five_ingredients', JSON.stringify(ingList));
+      if (confirmBuy) {
+        let now = new Date(); let todayDateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        let expenses = getExpenseList(); expenses.push({ desc: `Restock Bahan: ${ing.name} (${addQty} ${ing.unit})`, amount: totalCost, date: todayDateStr, timestamp: now.getTime() });
+        localStorage.setItem('three4five_expenses', JSON.stringify(expenses));
+      }
+      loadAdminDashboard();
+      alert("Stok bahan baku berhasil diperbarui!");
+    }
+
+    function openEditIngredientModal(id) {
+      let ingList = getIngredientList(); let ing = ingList.find(i => i.id === id); if (!ing) return;
+      document.getElementById('edit-ing-id').value = ing.id; document.getElementById('edit-ing-name').value = ing.name; document.getElementById('edit-ing-stock').value = ing.stock; document.getElementById('edit-ing-unit').value = ing.unit; document.getElementById('edit-ing-price').value = ing.price;
+      if (!editIngredientModalInstance) editIngredientModalInstance = new bootstrap.Modal(document.getElementById('editIngredientModal'));
+      editIngredientModalInstance.show();
+    }
+
+    function handleUpdateIngredient(event) {
+      event.preventDefault();
+      let id = parseInt(document.getElementById('edit-ing-id').value);
+      let name = document.getElementById('edit-ing-name').value;
+      let stock = parseFloat(document.getElementById('edit-ing-stock').value);
+      let unit = document.getElementById('edit-ing-unit').value;
+      let price = parseInt(document.getElementById('edit-ing-price').value);
+      let ingList = getIngredientList(); let index = ingList.findIndex(i => i.id === id); if (index === -1) return;
+      ingList[index] = { id, name, stock, unit, price }; localStorage.setItem('three4five_ingredients', JSON.stringify(ingList));
+      if (editIngredientModalInstance) editIngredientModalInstance.hide(); renderAdminIngredientTable(); alert("Data bahan baku berhasil diperbarui!");
+    }
+
+    function deleteIngredient(id) {
+      if (confirm("Yakin ingin menghapus bahan baku ini dari daftar?")) {
+        let ingList = getIngredientList(); ingList = ingList.filter(i => i.id !== id); localStorage.setItem('three4five_ingredients', JSON.stringify(ingList)); renderAdminIngredientTable();
+      }
+    }
+
+    function handleAddNewMenu(event) {
+      event.preventDefault();
+      let name = document.getElementById('new-menu-name').value;
+      let category = document.getElementById('new-menu-category').value;
+      let price = parseInt(document.getElementById('new-menu-price').value);
+      let stock = parseInt(document.getElementById('new-menu-stock').value);
+      let fileInput = document.getElementById('new-menu-image-file');
+      let menuList = getMenuList(); let newId = menuList.length > 0 ? Math.max(...menuList.map(m => m.id)) + 1 : 1;
+
+      if (fileInput.files && fileInput.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function(e) { saveMenuToStorage(newId, name, category, price, stock, e.target.result, menuList); };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        let defaultImg = 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300&auto=format&fit=crop&q=60';
+        saveMenuToStorage(newId, name, category, price, stock, defaultImg, menuList);
+      }
+    }
+
+    function saveMenuToStorage(id, name, category, price, stock, image, menuList) {
+      let newItem = { id, name, category, price, stock, image }; menuList.push(newItem); localStorage.setItem('three4five_menu', JSON.stringify(menuList));
+      document.getElementById('add-menu-form').reset(); document.getElementById('new-menu-stock').value = 50; renderAdminMenuTable(); alert("Menu dan stok baru berhasil ditambahkan!");
+    }
+
+    function handleAddExpense(event) {
+      event.preventDefault();
+      let desc = document.getElementById('expense-desc').value;
+      let amount = parseInt(document.getElementById('expense-amount').value);
+      let now = new Date(); let todayDateStr = now.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+      let expenses = getExpenseList(); expenses.push({ desc, amount, date: todayDateStr, timestamp: now.getTime() }); localStorage.setItem('three4five_expenses', JSON.stringify(expenses));
+      document.getElementById('add-expense-form').reset(); loadAdminDashboard(); alert("Pengeluaran berhasil dicatat!");
+    }
+
+    function handleAddCapital(event) {
+      event.preventDefault();
+      let desc = document.getElementById('capital-desc').value;
+      let amount = parseInt(document.getElementById('capital-amount').value);
+      let now = new Date(); let todayDateStr = now.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+      let capitals = getCapitalList(); capitals.push({ desc, amount, date: todayDateStr, timestamp: now.getTime() }); localStorage.setItem('three4five_capital', JSON.stringify(capitals));
+      document.getElementById('add-capital-form').reset(); loadAdminDashboard(); alert("Suntikan modal berhasil dicatat!");
+    }
+
+    function openEditModal(id) {
+      let menuList = getMenuList(); let item = menuList.find(m => m.id === id); if (!item) return;
+      document.getElementById('edit-menu-id').value = item.id; document.getElementById('edit-menu-name').value = item.name; document.getElementById('edit-menu-category').value = item.category; document.getElementById('edit-menu-price').value = item.price; document.getElementById('edit-menu-stock').value = item.stock !== undefined ? item.stock : 50; document.getElementById('edit-menu-image-file').value = '';
+      if (!editModalInstance) editModalInstance = new bootstrap.Modal(document.getElementById('editMenuModal'));
+      editModalInstance.show();
+    }
+
+    function handleUpdateMenu(event) {
+      event.preventDefault();
+      let id = parseInt(document.getElementById('edit-menu-id').value);
+      let name = document.getElementById('edit-menu-name').value;
+      let category = document.getElementById('edit-menu-category').value;
+      let price = parseInt(document.getElementById('edit-menu-price').value);
+      let stock = parseInt(document.getElementById('edit-menu-stock').value);
+      let fileInput = document.getElementById('edit-menu-image-file');
+      let menuList = getMenuList(); let itemIndex = menuList.findIndex(m => m.id === id); if (itemIndex === -1) return;
+
+      let updateAction = function(imgUrl) {
+        menuList[itemIndex].name = name; menuList[itemIndex].category = category; menuList[itemIndex].price = price; menuList[itemIndex].stock = stock; if (imgUrl) menuList[itemIndex].image = imgUrl;
+        localStorage.setItem('three4five_menu', JSON.stringify(menuList));
+        if (editModalInstance) editModalInstance.hide(); renderAdminMenuTable(); alert("Menu dan stok berhasil diperbarui!");
+      };
+
+      if (fileInput.files && fileInput.files[0]) {
+        let reader = new FileReader(); reader.onload = function(e) { updateAction(e.target.result); }; reader.readAsDataURL(fileInput.files[0]);
+      } else updateAction(null);
+    }
+
+    function deleteMenu(id) {
+      if (confirm("Yakin ingin menghapus menu ini?")) {
+        let menuList = getMenuList(); menuList = menuList.filter(item => item.id !== id); localStorage.setItem('three4five_menu', JSON.stringify(menuList)); renderAdminMenuTable();
+      }
+    }
+
+    function clearTransactions() {
+      if (confirm("Hapus seluruh riwayat transaksi penjualan?")) {
+        localStorage.removeItem('three4five_trx'); loadAdminDashboard();
+      }
+    }
+
+    /* ========== MANAJEMEN AKUN PENGGUNA =========== */
+
+    let editUserModalInstance = null;
+
+    function renderAdminUserTable() {
+      let userList = getUserList();
+      let tbody = document.getElementById('admin-user-list');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (userList.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">Belum ada akun.</td></tr>`; return; }
+      userList.forEach(u => {
+        let roleBadge = u.role === 'admin'
+          ? `<span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1">Admin</span>`
+          : `<span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1">Kasir</span>`;
+        tbody.innerHTML += `<tr>
+            <td><strong class="small text-dark">${u.name}</strong></td>
+            <td><span class="small text-secondary">${u.username}</span></td>
+            <td>${roleBadge}</td>
+            <td class="text-end">
+              <button class="btn btn-outline-primary btn-sm py-0 px-3 rounded-pill me-1" onclick="openEditUserModal(${u.id})">Edit</button>
+              <button class="btn btn-outline-danger btn-sm py-0 px-3 rounded-pill" onclick="deleteUser(${u.id})">Hapus</button>
+            </td>
+          </tr>`;
+      });
+    }
+
+    function handleAddNewUser(event) {
+      event.preventDefault();
+      let name = document.getElementById('new-user-name').value.trim();
+      let username = document.getElementById('new-user-username').value.trim().toLowerCase();
+      let password = document.getElementById('new-user-password').value;
+      let role = document.getElementById('new-user-role').value;
+
+      if (password.length < 4) { alert("Password minimal 4 karakter!"); return; }
+
+      let userList = getUserList();
+      if (userList.some(u => u.username.toLowerCase() === username)) {
+        alert("Username sudah digunakan! Silakan pilih username lain.");
+        return;
+      }
+
+      let newId = userList.length > 0 ? Math.max(...userList.map(u => u.id)) + 1 : 1;
+      userList.push({ id: newId, name, username, password, role });
+      saveUserList(userList);
+      document.getElementById('add-user-form').reset();
+      renderAdminUserTable();
+      alert("Akun baru berhasil ditambahkan!");
+    }
+
+    function openEditUserModal(id) {
+      let userList = getUserList();
+      let u = userList.find(x => x.id === id); if (!u) return;
+      document.getElementById('edit-user-id').value = u.id;
+      document.getElementById('edit-user-name').value = u.name;
+      document.getElementById('edit-user-username').value = u.username;
+      document.getElementById('edit-user-password').value = '';
+      document.getElementById('edit-user-role').value = u.role;
+      if (!editUserModalInstance) editUserModalInstance = new bootstrap.Modal(document.getElementById('editUserModal'));
+      editUserModalInstance.show();
+    }
+
+    function handleUpdateUser(event) {
+      event.preventDefault();
+      let id = parseInt(document.getElementById('edit-user-id').value);
+      let name = document.getElementById('edit-user-name').value.trim();
+      let username = document.getElementById('edit-user-username').value.trim().toLowerCase();
+      let password = document.getElementById('edit-user-password').value;
+      let role = document.getElementById('edit-user-role').value;
+
+      let userList = getUserList();
+      let index = userList.findIndex(u => u.id === id); if (index === -1) return;
+
+      if (userList.some(u => u.id !== id && u.username.toLowerCase() === username)) {
+        alert("Username sudah digunakan oleh akun lain!");
+        return;
+      }
+
+      if (userList[index].role === 'admin' && role !== 'admin') {
+        let adminCount = userList.filter(u => u.role === 'admin').length;
+        if (adminCount <= 1) { alert("Tidak bisa mengubah role akun Admin terakhir!"); return; }
+      }
+
+      userList[index].name = name;
+      userList[index].username = username;
+      userList[index].role = role;
+      if (password) userList[index].password = password;
+
+      saveUserList(userList);
+      if (editUserModalInstance) editUserModalInstance.hide();
+      renderAdminUserTable();
+      alert("Akun berhasil diperbarui!");
+    }
+
+    function deleteUser(id) {
+      let userList = getUserList();
+      let u = userList.find(x => x.id === id); if (!u) return;
+
+      if (u.role === 'admin') {
+        let adminCount = userList.filter(x => x.role === 'admin').length;
+        if (adminCount <= 1) { alert("Tidak bisa menghapus akun Admin terakhir!"); return; }
+      }
+
+      let session = JSON.parse(localStorage.getItem('three4five_session') || '{}');
+      if (session.username && session.username.toLowerCase() === u.username.toLowerCase()) {
+        alert("Tidak bisa menghapus akun yang sedang digunakan untuk login!");
+        return;
+      }
+
+      if (confirm(`Yakin ingin menghapus akun "${u.name}" (${u.username})?`)) {
+        userList = userList.filter(x => x.id !== id);
+        saveUserList(userList);
+        renderAdminUserTable();
+        alert("Akun berhasil dihapus!");
+      }
+    }
+  </script>
+</body>
+</html>
