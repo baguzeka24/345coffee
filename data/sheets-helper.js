@@ -1,18 +1,28 @@
-/* data/sheets-helper.js - JSONP version
-   Paste ke data/sheets-helper.js di repo dan pastikan <script src="data/sheets-helper.js"></script> dimuat DI AKHIR index.html
-   Sesuaikan APP_SCRIPT_URL jika perlu (deploy URL Apps Script).
+/* data/sheets-helper.js - JSONP version with transactions mapping
+   Paste ke data/sheets-helper.js di repo dan pastikan <script src="data/sheets-helper.js"></script>
+   dimuat DI AKHIR index.html (sebelum </body>).
+
+   Catatan:
+   - Sesuaikan APP_SCRIPT_URL jika Anda redeploy Apps Script ke URL lain.
+   - Fungsi kirimKeGoogleSheets mengambil transaksi terbaru dari localStorage key 'three4five_trx'
+     dan memetakan field ke header sheet: date, items, method, cashReceived, change, timestamp
+     (sesuaikan jika header sheet Anda berbeda).
 */
 
 (function(){
-  const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUp_UL_DiP6gwiDmF5cf1NwtgMYE7mifqPEakDJ7r7artxS61l3pgaKfCYgx0af0n34A/exec";
+  // === GANTI INI dengan Apps Script Web App URL Anda jika perlu ===
+  const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwy6FiuR9tFdn7wK1dDIAy6FPUv0JPozi5xRN9UIv3e9aiw9hsRSKkLxVxpP6F_djxsmQ/exec";
 
-  // JSONP helper: buat callback, inject script tag, cleanup
+  // ---------------- JSONP helper --------------------------------------
   function jsonpRequest(params, timeoutMs = 8000) {
     return new Promise((resolve, reject) => {
       const callbackName = '__three4five_cb_' + Math.random().toString(36).slice(2);
       // build url with callback param
+      params = params || {};
       params.callback = callbackName;
-      const url = APP_SCRIPT_URL + '?' + Object.keys(params).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(typeof params[k] === 'string' ? params[k] : JSON.stringify(params[k]))}`).join('&');
+      const url = APP_SCRIPT_URL + '?' + Object.keys(params).map(k =>
+        `${encodeURIComponent(k)}=${encodeURIComponent(typeof params[k] === 'string' ? params[k] : JSON.stringify(params[k]))}`
+      ).join('&');
 
       const script = document.createElement('script');
       script.src = url;
@@ -47,7 +57,7 @@
     });
   }
 
-  // fetchFromSheets via JSONP (action: getMenu/getUsers/getIngredients)
+  // ---------------- client helpers ------------------------------------
   async function fetchFromSheets(action) {
     try {
       const resp = await jsonpRequest({ action: action });
@@ -60,7 +70,6 @@
     }
   }
 
-  // postToSheets via JSONP (write actions: addTransaction/addExpense/addCapital)
   async function postToSheets(action, dataPayload) {
     try {
       const resp = await jsonpRequest({ action: action, data: typeof dataPayload === 'string' ? dataPayload : JSON.stringify(dataPayload) });
@@ -71,7 +80,7 @@
     }
   }
 
-  // Seed localStorage from Sheets if empty
+  // ---------------- seed localStorage from Sheets ----------------------
   async function seedFromSheetsIfEmpty() {
     try {
       if (!localStorage.getItem('three4five_menu')) {
@@ -100,25 +109,44 @@
     }
   }
 
-  // Override kirimKeGoogleSheets to use JSONP postToSheets
-  window.kirimKeGoogleSheets = function(tanggalStr, keteranganStr, masukNominal, metodeBayar) {
-    const dataKirim = {
-      date: tanggalStr,
-      desc: keteranganStr,
-      in: masukNominal,
-      out: 0,
-      method: metodeBayar,
-      timestamp: Date.now()
-    };
-    postToSheets('addTransaction', dataKirim)
-      .then(resp => {
-        if (resp && resp.ok) console.log('[Sheets] Transaksi tersimpan via JSONP');
-        else console.warn('[Sheets] postToSheets response', resp);
-      })
-      .catch(err => console.warn('[Sheets] gagal post transaction', err));
+  // ---------------- mapping & send transaction -------------------------
+  // This function reads the latest transaction from localStorage and maps fields
+  // to the sheet headers: date, items, method, cashReceived, change, timestamp.
+  window.kirimKeGoogleSheets = async function() {
+    try {
+      const trxs = JSON.parse(localStorage.getItem('three4five_trx') || '[]');
+      if (!Array.isArray(trxs) || trxs.length === 0) {
+        console.warn('[Sheets] Tidak ada transaksi di localStorage untuk dikirim.');
+        return;
+      }
+      // Many implementations add new trx at start (unshift). Adjust if needed.
+      const latest = trxs[0] || trxs[trxs.length - 1];
+
+      const payload = {
+        // Adjust property names below if your sheet headers differ.
+        date: latest.date || '',
+        items: Array.isArray(latest.items) ? latest.items.map(i => {
+          // handle different item shapes
+          if (typeof i === 'string') return i;
+          const name = i.name || i.title || i.label || '';
+          const qty = i.qty || i.quantity || i.count || 1;
+          return `${name} (x${qty})`;
+        }).join(', ') : (latest.items || ''),
+        method: latest.method || latest.paymentMethod || '',
+        cashReceived: latest.cashReceived != null ? latest.cashReceived : (latest.paid || 0),
+        change: latest.change != null ? latest.change : 0,
+        timestamp: latest.timestamp || Date.now()
+      };
+
+      const resp = await postToSheets('addTransaction', payload);
+      if (resp && resp.ok) console.log('[Sheets] Transaksi terbaru tersimpan via JSONP');
+      else console.warn('[Sheets] Response saat menyimpan transaksi:', resp);
+    } catch (err) {
+      console.error('[Sheets] gagal post transaction', err);
+    }
   };
 
-  // Attach listeners for expense & capital forms
+  // ---------------- attach listeners for expense & capital forms --------
   function attachFormSyncListeners() {
     const expenseForm = document.getElementById('add-expense-form');
     if (expenseForm) {
@@ -130,6 +158,7 @@
               const latest = list[list.length - 1];
               const r = await postToSheets('addExpense', latest);
               if (r && r.ok) console.log('[Sheets] expense saved (JSONP)');
+              else console.warn('[Sheets] expense save response', r);
             }
           } catch (e) { console.warn('[Sheets] expense listener read error', e); }
         }, 150);
@@ -146,6 +175,7 @@
               const latest = list[list.length - 1];
               const r = await postToSheets('addCapital', latest);
               if (r && r.ok) console.log('[Sheets] capital saved (JSONP)');
+              else console.warn('[Sheets] capital save response', r);
             }
           } catch (e) { console.warn('[Sheets] capital listener read error', e); }
         }, 150);
@@ -153,18 +183,33 @@
     }
   }
 
-  // Init
+  // ---------------- optional helper functions ---------------------------
+  async function syncMenuToLocal() {
+    const menu = await fetchFromSheets('getMenu');
+    if (Array.isArray(menu)) {
+      localStorage.setItem('three4five_menu', JSON.stringify(menu));
+      console.log('[Sheets] menu synced to localStorage');
+      return true;
+    }
+    return false;
+  }
+
+  // ---------------- init on load ---------------------------------------
   function initSheetsHelper() {
     seedFromSheetsIfEmpty().finally(() => attachFormSyncListeners());
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSheetsHelper);
-  else initSheetsHelper();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSheetsHelper);
+  } else {
+    initSheetsHelper();
+  }
 
   // expose debug helpers
   window.__three4five_sheets = {
     postToSheets,
     fetchFromSheets,
+    syncMenuToLocal,
     APP_SCRIPT_URL
   };
 
