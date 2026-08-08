@@ -19,7 +19,7 @@
   'use strict';
 
   // Default fallback URL (replace if you have a different deployment) - still override via config or data- attribute
-  const DEFAULT_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUp_UL_DiP6gwiDmF5cf1NwtgMYE7mifqPEakDJ7r7artxS61l3pgaKfCYgx0af0n34A/exec';
+  const DEFAULT_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6SuUR_2DVgvmvrMiAFZDFd69BV6hR7uzuYbWcslslPvLGInxzkl_Ytn2De4epuBrnUg/exec';
 
   // Read config from global if provided
   const GLOBAL_CONFIG = (window.__three4five_config && typeof window.__three4five_config === 'object') ? window.__three4five_config : {};
