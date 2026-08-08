@@ -1,0 +1,35 @@
+:root{
+  --primary-green: #064e3b;
+  --card-radius: 14px;
+  --soft-shadow: 0 8px 20px rgba(5,10,20,0.04);
+}
+body.theme-new{
+  background: #fbfdfc;
+  color: #0f172a;
+  font-family: 'Poppins', sans-serif;
+}
+/* Cards */
+body.theme-new .card{
+  border-radius: var(--card-radius);
+  box-shadow: var(--soft-shadow);
+  border: 1px solid #e6eef0;
+}
+/* Header */
+body.theme-new .elegant-header{
+  background: linear-gradient(90deg,#ffffff,#f7fff9);
+  border-bottom:1px solid #e6eef0;
+  height:68px;
+}
+/* Buttons */
+body.theme-new .btn-success-custom{
+  background:var(--primary-green);
+  border-radius:12px;
+  padding:10px 14px;
+  box-shadow:0 6px 14px rgba(2,44,34,0.08);
+}
+body.theme-new .btn-success-custom:hover{ background:#053826; }
+/* Menu cards */
+body.theme-new .menu-card{ transition: transform .18s ease, box-shadow .18s ease; }
+body.theme-new .menu-card:hover{ transform: translateY(-4px); box-shadow: 0 10px 30px rgba(2,12,10,0.06); }
+/* Responsive */
+@media (max-width:768px){ body.theme-new .menu-img{ height:90px; } }
