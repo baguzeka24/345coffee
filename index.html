@@ -1,209 +1,910 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Three4Five Coffee</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three4Five Coffee — POS</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    :root{--primary-green:#064e3b;--primary-hover:#022c22;--light-bg:#f8fafc;--card-bg:#fff;--text-dark:#0f172a;--border-color:#e2e8f0}
-    html,body{height:100%}
-    body{font-family:'Poppins',sans-serif;background:var(--light-bg);color:var(--text-dark);margin:0;min-height:100vh}
-    .card{border:1px solid var(--border-color);border-radius:12px;background:var(--card-bg);box-shadow:0 6px 18px rgba(0,0,0,0.03)}
-    .menu-img{height:110px;object-fit:cover}
-    .btn-success-custom{background:var(--primary-green);color:#fff;border-radius:10px;padding:10px 14px;border:0}
-    .hidden{display:none}
-    .elegant-header{background:white;padding:12px 28px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000}
+    :root{
+      --green:#064e3b;
+      --green-dark:#022c22;
+      --green-soft:#e8f3ef;
+      --cream:#f7f5ef;
+      --bg:#f4f6f5;
+      --white:#ffffff;
+      --text:#17211d;
+      --muted:#7a8580;
+      --line:#e5e9e7;
+      --danger:#c0392b;
+      --shadow:0 12px 35px rgba(19,42,34,.07);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select{font-family:inherit}
+    button{cursor:pointer}
+    .hidden{display:none!important}
+
+    /* APP SHELL */
+    .app-shell{min-height:100vh;display:flex}
+
+    .sidebar{
+      width:245px;min-height:100vh;background:var(--green-dark);color:#fff;
+      padding:24px 16px;position:fixed;left:0;top:0;bottom:0;z-index:1050;
+      display:flex;flex-direction:column;
+    }
+
+    .brand{display:flex;align-items:center;gap:12px;padding:3px 10px 28px}
+    .brand-icon{
+      width:43px;height:43px;border-radius:13px;background:#fff;color:var(--green);
+      display:flex;align-items:center;justify-content:center;font-size:21px;
+      box-shadow:0 8px 20px rgba(0,0,0,.15)
+    }
+    .brand-text strong{font-family:'Poppins',sans-serif;font-size:17px;display:block;letter-spacing:-.3px}
+    .brand-text span{font-size:10px;color:#a9c3b9;letter-spacing:1.5px;text-transform:uppercase}
+
+    .nav-label{font-size:10px;color:#78978c;text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px 10px}
+    .side-nav{display:flex;flex-direction:column;gap:5px}
+    .side-nav button{
+      border:0;background:transparent;color:#b7c9c2;border-radius:12px;
+      padding:12px 13px;text-align:left;display:flex;align-items:center;gap:11px;
+      font-size:13px;font-weight:600;transition:.2s;
+    }
+    .side-nav button:hover{background:rgba(255,255,255,.07);color:#fff}
+    .side-nav button.active{background:#fff;color:var(--green-dark);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+    .nav-icon{width:24px;text-align:center;font-size:17px}
+
+    .sidebar-bottom{margin-top:auto;border-top:1px solid rgba(255,255,255,.09);padding:18px 10px 4px}
+    .cashier-profile{display:flex;align-items:center;gap:10px}
+    .avatar{width:38px;height:38px;border-radius:50%;background:#dbeae4;color:var(--green-dark);display:flex;align-items:center;justify-content:center;font-weight:800}
+    .cashier-profile strong{display:block;font-size:12px}
+    .cashier-profile span{font-size:10px;color:#8da79e}
+
+    /* MAIN */
+    .main-area{margin-left:245px;width:calc(100% - 245px);min-width:0}
+    .topbar{
+      height:76px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);display:flex;align-items:center;
+      justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:900;
+    }
+    .page-title h1{font-family:'Poppins',sans-serif;font-size:20px;margin:0;font-weight:700}
+    .page-title p{margin:3px 0 0;color:var(--muted);font-size:11px}
+    .top-actions{display:flex;align-items:center;gap:10px}
+    .date-pill{background:#f4f7f5;border:1px solid var(--line);padding:9px 13px;border-radius:11px;font-size:11px;color:#66726d}
+    .mobile-menu{display:none;border:0;background:var(--green);color:#fff;border-radius:10px;width:40px;height:40px}
+
+    .content{padding:28px 32px 40px}
+
+    /* KASIR */
+    .pos-layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;align-items:start}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+    .section-head h2{font-family:'Poppins',sans-serif;font-size:17px;margin:0}
+    .section-head span{font-size:11px;color:var(--muted)}
+
+    .category-bar{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 14px;scrollbar-width:none}
+    .category-bar::-webkit-scrollbar{display:none}
+    .category-btn{
+      border:1px solid var(--line);background:#fff;color:#69746f;
+      padding:9px 16px;border-radius:10px;font-size:11px;font-weight:700;
+      white-space:nowrap;transition:.2s;
+    }
+    .category-btn:hover,.category-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+
+    .menu-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .menu-grid>.col-md-4{width:auto;padding:0!important}
+    .menu-card{
+      background:#fff;border:1px solid var(--line);border-radius:17px;overflow:hidden;
+      box-shadow:0 5px 18px rgba(19,42,34,.04);transition:.22s;height:100%;
+      display:flex;flex-direction:column;
+    }
+    .menu-card:hover{transform:translateY(-3px);box-shadow:0 13px 28px rgba(19,42,34,.1)}
+    .menu-photo{height:150px;position:relative;background:#e9eeeb;overflow:hidden}
+    .menu-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s}
+    .menu-card:hover .menu-photo img{transform:scale(1.035)}
+    .stock-badge{
+      position:absolute;top:10px;right:10px;background:rgba(255,255,255,.93);
+      padding:5px 8px;border-radius:8px;font-size:9px;font-weight:700;color:var(--green);
+    }
+    .menu-body{padding:13px;display:flex;flex-direction:column;flex:1}
+    .menu-category{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#8a9791;font-weight:700;margin-bottom:5px}
+    .menu-name{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;margin-bottom:7px;line-height:1.3}
+    .menu-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;gap:8px}
+    .menu-price{font-size:13px;font-weight:800;color:var(--green)}
+    .add-btn{
+      border:0;background:var(--green);color:#fff;border-radius:9px;padding:8px 11px;
+      font-size:10px;font-weight:800;transition:.2s;
+    }
+    .add-btn:hover{background:var(--green-dark)}
+    .empty-menu{grid-column:1/-1;background:#fff;border:1px dashed #ccd5d1;border-radius:15px;padding:45px 20px;text-align:center;color:var(--muted);font-size:12px}
+
+    /* CART */
+    .cart-panel{
+      background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);
+      padding:20px;position:sticky;top:96px;
+    }
+    .cart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px}
+    .cart-head h2{font-family:'Poppins',sans-serif;font-size:16px;margin:0}
+    .cart-count{min-width:25px;height:25px;border-radius:8px;background:var(--green-soft);color:var(--green);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
+    .cart-list{min-height:80px;max-height:310px;overflow:auto;border-bottom:1px solid var(--line);padding-bottom:8px}
+    .empty-cart{text-align:center;padding:35px 10px;color:#a0aaa6;font-size:11px}
+    .empty-cart .cart-empty-icon{font-size:28px;margin-bottom:7px}
+    .cart-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:11px 0;border-bottom:1px solid #f0f2f1}
+    .cart-item:last-child{border-bottom:0}
+    .cart-item-name{font-size:11px;font-weight:700;margin-bottom:5px}
+    .cart-item-meta{font-size:10px;color:var(--muted)}
+    .cart-item-right{text-align:right}
+    .cart-item-price{font-size:11px;font-weight:800}
+    .remove-btn{border:0;background:none;color:#b2bbb7;font-size:9px;padding:3px 0}
+    .remove-btn:hover{color:var(--danger)}
+
+    .summary{padding-top:15px}
+    .summary-row{display:flex;justify-content:space-between;font-size:11px;color:#69736f;margin-bottom:9px}
+    .summary-row strong{color:var(--text)}
+    .summary-total{display:flex;justify-content:space-between;align-items:end;border-top:1px dashed #dce2df;padding-top:14px;margin-top:5px;margin-bottom:18px}
+    .summary-total span{font-size:11px;color:var(--muted)}
+    .summary-total strong{font-family:'Poppins',sans-serif;font-size:22px;color:var(--green)}
+
+    .payment-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#7c8883;font-weight:800;margin-bottom:8px}
+    .payment-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
+    .payment-option{position:relative}
+    .payment-option input{position:absolute;opacity:0}
+    .payment-option label{
+      display:flex;align-items:center;justify-content:center;padding:10px;border:1px solid var(--line);
+      border-radius:10px;font-size:10px;font-weight:700;color:#68736f;background:#fff;cursor:pointer;transition:.2s;
+    }
+    .payment-option input:checked+label{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+    .cash-wrap{margin-bottom:10px}
+    .cash-wrap input{height:40px;border:1px solid var(--line);border-radius:10px;font-size:11px;padding:0 12px;outline:none;width:100%}
+    .cash-wrap input:focus{border-color:#83a99c;box-shadow:0 0 0 3px rgba(6,78,59,.07)}
+    .pay-btn{
+      width:100%;height:46px;border:0;border-radius:11px;background:var(--green);color:#fff;
+      font-size:11px;font-weight:800;box-shadow:0 8px 17px rgba(6,78,59,.18);transition:.2s;
+    }
+    .pay-btn:hover{background:var(--green-dark);transform:translateY(-1px)}
+    .pay-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+    /* ADMIN */
+    .admin-grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:22px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+    .panel-head{padding:17px 19px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+    .panel-head h3{font-family:'Poppins',sans-serif;font-size:14px;margin:0}
+    .panel-body{padding:19px}
+    .form-label-custom{font-size:10px;font-weight:700;color:#69746f;margin-bottom:6px;display:block}
+    .custom-input,.custom-select{
+      width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:0 11px;
+      outline:none;font-size:11px;background:#fff;margin-bottom:13px;
+    }
+    .custom-input:focus,.custom-select:focus{border-color:#83a99c;box-shadow:0 0 0 3px rgba(6,78,59,.07)}
+    .save-btn{width:100%;height:42px;border:0;background:var(--green);color:#fff;border-radius:10px;font-size:11px;font-weight:800}
+    .sync-box{border-top:1px solid var(--line);margin-top:18px;padding-top:17px}
+    .sync-btn{
+      width:100%;height:39px;border:1px solid var(--line);background:#fff;color:#5f6d67;
+      border-radius:9px;font-size:10px;font-weight:700;margin-bottom:8px;
+    }
+    .sync-btn:hover{border-color:#aabdb5;background:#f7faf8}
+    .sync-btn.debug{border-color:#d8dedb}
+
+    .table-wrap{overflow:auto}
+    .admin-table{width:100%;border-collapse:collapse}
+    .admin-table th{background:#f7f9f8;color:#87928e;font-size:9px;text-transform:uppercase;letter-spacing:.7px;padding:11px 12px;text-align:left;white-space:nowrap}
+    .admin-table td{border-bottom:1px solid #eef1ef;padding:12px;font-size:10px;vertical-align:middle}
+    .admin-table tr:last-child td{border-bottom:0}
+    .category-tag{background:var(--green-soft);color:var(--green);padding:5px 8px;border-radius:7px;font-size:8px;font-weight:800}
+    .stock-tag{font-weight:700}
+
+    /* TOAST */
+    .toast-message{
+      position:fixed;right:24px;bottom:24px;z-index:3000;background:var(--green-dark);color:#fff;
+      padding:12px 16px;border-radius:11px;font-size:11px;box-shadow:0 12px 30px rgba(0,0,0,.18);
+      opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s;
+    }
+    .toast-message.show{opacity:1;transform:translateY(0)}
+
+    footer{font-size:10px;color:#9aa49f;text-align:center;padding:0 20px 20px}
+
+    @media(max-width:1150px){
+      .pos-layout{grid-template-columns:minmax(0,1fr) 330px}
+      .menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-100%);transition:.25s}
+      .sidebar.open{transform:translateX(0)}
+      .main-area{margin-left:0;width:100%}
+      .mobile-menu{display:block}
+      .topbar{padding:0 18px}
+      .content{padding:20px 18px 30px}
+      .pos-layout{grid-template-columns:1fr}
+      .cart-panel{position:relative;top:0}
+      .admin-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:560px){
+      .topbar{height:68px}
+      .page-title h1{font-size:16px}
+      .date-pill{display:none}
+      .menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+      .menu-photo{height:115px}
+      .menu-body{padding:10px}
+      .menu-name{font-size:11px}
+      .menu-price{font-size:11px}
+      .add-btn{padding:7px 8px;font-size:9px}
+      .cart-panel{padding:15px}
+    }
+    @media(max-width:370px){
+      .menu-grid{grid-template-columns:1fr}
+    }
   </style>
 </head>
+
 <body>
-  <div class="elegant-header">
-    <h4 class="mb-0" style="color:var(--primary-green)">Three4Five Coffee</h4>
-    <div>
-      <button id="nav-kasir" class="btn btn-outline-success btn-sm me-2">Kasir</button>
-      <button id="nav-admin" class="btn btn-outline-primary btn-sm">Admin</button>
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">☕</div>
+      <div class="brand-text">
+        <strong>Three4Five</strong>
+        <span>Coffee & POS</span>
+      </div>
     </div>
-  </div>
 
-  <main class="container py-4">
-    <!-- KASIR VIEW -->
-    <section id="view-kasir">
-      <div class="row g-4">
-        <div class="col-lg-8">
-          <div class="d-flex gap-2 mb-3 overflow-auto" id="category-bar"></div>
-          <div class="row g-3" id="menu-grid"></div>
+    <div class="nav-label">Menu Utama</div>
+    <nav class="side-nav">
+      <button id="nav-kasir" class="active" type="button">
+        <span class="nav-icon">▣</span>
+        <span>Kasir</span>
+      </button>
+      <button id="nav-admin" type="button">
+        <span class="nav-icon">⚙</span>
+        <span>Admin & Menu</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="cashier-profile">
+        <div class="avatar">K</div>
+        <div>
+          <strong>Kasir</strong>
+          <span>Three4Five Coffee</span>
         </div>
+      </div>
+    </div>
+  </aside>
 
-        <div class="col-lg-4">
-          <div class="card p-3 sticky-top" style="top:20px">
-            <h6 class="fw-bold">Pesanan Saat Ini</h6>
-            <div id="cart-list" class="mb-3">Keranjang kosong</div>
+  <!-- MAIN -->
+  <div class="main-area">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="mobile-menu" id="mobile-menu" type="button">☰</button>
+        <div class="page-title">
+          <h1 id="page-title">Kasir</h1>
+          <p id="page-subtitle">Kelola pesanan dan pembayaran pelanggan</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="date-pill" id="current-date"></div>
+      </div>
+    </header>
 
-            <div class="d-flex justify-content-between mb-2"><span>Subtotal</span><strong id="subtotal-text">Rp 0</strong></div>
-            <div class="d-flex justify-content-between mb-3"><span>Pajak (0%)</span><strong>Rp 0</strong></div>
-            <div class="d-flex justify-content-between mb-3"><span class="fw-bold">Total</span><strong id="total-text">Rp 0</strong></div>
+    <main class="content">
 
-            <div class="mb-3">
-              <label class="form-label small">Metode Pembayaran</label>
-              <select id="payment-method" class="form-select mb-2"><option value="Tunai">Tunai</option><option value="QRIS">QRIS</option></select>
-              <input id="cash-received" class="form-control mb-2" placeholder="Uang Tunai Diterima (opsional)" type="number">
+      <!-- KASIR VIEW -->
+      <section id="view-kasir">
+        <div class="pos-layout">
+
+          <div>
+            <div class="section-head">
+              <h2>Daftar Menu</h2>
+              <span id="menu-count">0 menu</span>
             </div>
 
-            <button id="btn-pay" class="btn-success-custom w-100">Proses Pembayaran</button>
+            <div class="category-bar" id="category-bar">
+              <button class="category-btn active" data-category="all" type="button">Semua Menu</button>
+              <button class="category-btn" data-category="ice-coffee" type="button">Ice Coffee</button>
+              <button class="category-btn" data-category="americano" type="button">Americano</button>
+              <button class="category-btn" data-category="non-coffee" type="button">Non Coffee</button>
+            </div>
+
+            <div class="menu-grid" id="menu-grid"></div>
+          </div>
+
+          <!-- CART -->
+          <aside class="cart-panel">
+            <div class="cart-head">
+              <h2>Pesanan Saat Ini</h2>
+              <div class="cart-count" id="cart-count">0</div>
+            </div>
+
+            <div id="cart-list" class="cart-list">
+              <div class="empty-cart">
+                <div class="cart-empty-icon">🛒</div>
+                Belum ada menu yang dipilih
+              </div>
+            </div>
+
+            <div class="summary">
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <strong id="subtotal-text">Rp 0</strong>
+              </div>
+              <div class="summary-row">
+                <span>Pajak</span>
+                <strong>Rp 0</strong>
+              </div>
+
+              <div class="summary-total">
+                <span>Total Pembayaran</span>
+                <strong id="total-text">Rp 0</strong>
+              </div>
+
+              <div class="payment-title">Metode Pembayaran</div>
+
+              <div class="payment-options">
+                <div class="payment-option">
+                  <input type="radio" name="payment" id="pay-tunai" value="Tunai" checked>
+                  <label for="pay-tunai">💵 Tunai</label>
+                </div>
+                <div class="payment-option">
+                  <input type="radio" name="payment" id="pay-qris" value="QRIS">
+                  <label for="pay-qris">▦ QRIS</label>
+                </div>
+              </div>
+
+              <div class="cash-wrap" id="cash-wrap">
+                <input id="cash-received" placeholder="Uang tunai diterima" type="number" min="0">
+              </div>
+
+              <button id="btn-pay" class="pay-btn" type="button">Proses Pembayaran</button>
+            </div>
+          </aside>
+
+        </div>
+      </section>
+
+      <!-- ADMIN VIEW -->
+      <section id="view-admin" class="hidden">
+        <div class="section-head">
+          <div>
+            <h2>Manajemen Menu</h2>
+            <span>Kelola daftar produk Three4Five Coffee</span>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- ADMIN VIEW -->
-    <section id="view-admin" class="hidden">
-      <div class="row">
-        <div class="col-lg-4">
-          <div class="card p-3 mb-3">
-            <h6>Tambah Menu</h6>
-            <form id="add-menu-form">
-              <input id="new-menu-name" class="form-control mb-2" placeholder="Nama Menu" required>
-              <input id="new-menu-price" class="form-control mb-2" placeholder="Harga" type="number" required>
-              <input id="new-menu-stock" class="form-control mb-2" placeholder="Stok" type="number" value="50">
-              <select id="new-menu-category" class="form-select mb-2"><option value="ice-coffee">Ice Coffee</option><option value="americano">Americano</option><option value="non-coffee">Non Coffee</option></select>
-              <button class="btn btn-success w-100" type="submit">Simpan ke Sheets</button>
-            </form>
+        <div class="admin-grid">
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Tambah Menu</h3>
+            </div>
+            <div class="panel-body">
+              <form id="add-menu-form">
+                <label class="form-label-custom" for="new-menu-name">Nama Menu</label>
+                <input id="new-menu-name" class="custom-input" placeholder="Contoh: Ice Latte" required>
+
+                <label class="form-label-custom" for="new-menu-price">Harga</label>
+                <input id="new-menu-price" class="custom-input" placeholder="Contoh: 18000" type="number" min="0" required>
+
+                <label class="form-label-custom" for="new-menu-stock">Stok</label>
+                <input id="new-menu-stock" class="custom-input" placeholder="Jumlah stok" type="number" min="0" value="50">
+
+                <label class="form-label-custom" for="new-menu-category">Kategori</label>
+                <select id="new-menu-category" class="custom-select">
+                  <option value="ice-coffee">Ice Coffee</option>
+                  <option value="americano">Americano</option>
+                  <option value="non-coffee">Non Coffee</option>
+                </select>
+
+                <button class="save-btn" type="submit">＋ Simpan ke Sheets</button>
+              </form>
+
+              <div class="sync-box">
+                <button id="reload-sheets" class="sync-btn" type="button">↻ Reload dari Sheets</button>
+                <button id="force-seed" class="sync-btn debug" type="button">Local Seed / Debug</button>
+              </div>
+            </div>
           </div>
 
-          <div class="card p-3">
-            <h6>Sync</h6>
-            <button id="reload-sheets" class="btn btn-outline-primary w-100 mb-2">Reload dari Sheets</button>
-            <button id="force-seed" class="btn btn-outline-secondary w-100">Force seed local (debug)</button>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Daftar Menu</h3>
+              <span id="admin-menu-count" style="font-size:10px;color:#87928e">0 item</span>
+            </div>
+            <div class="table-wrap">
+              <div id="admin-menu-list"></div>
+            </div>
           </div>
+
         </div>
+      </section>
 
-        <div class="col-lg-8">
-          <div class="card p-3">
-            <h6>Daftar Menu (dari Sheets)</h6>
-            <div id="admin-menu-list"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+    </main>
 
-  <footer class="text-center py-3 text-muted">&copy; Three4Five</footer>
+    <footer>&copy; Three4Five Coffee · Point of Sale</footer>
+  </div>
+</div>
 
-  <!-- App Script URL config -->
-  <script>
-    window.__three4five_config = {
-      APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyep_2ZvPePJfNLAhsFteZnjRmxZ0cGPhzrorCUibVrKasE87gI5U9Ube6JSbXsBQdJ4g/exec',
-      forceSyncOnLoad: true
-    };
-  </script>
+<div class="toast-message" id="toast-message"></div>
 
-  <script src="data/sheets-helper.js" data-app-script-url="https://script.google.com/macros/s/AKfycbyep_2ZvPePJfNLAhsFteZnjRmxZ0cGPhzrorCUibVrKasE87gI5U9Ube6JSbXsBQdJ4g/exec"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- App Script URL config -->
+<script>
+  window.__three4five_config = {
+    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyep_2ZvPePJfNLAhsFteZnjRmxZ0cGPhzrorCUibVrKasE87gI5U9Ube6JSbXsBQdJ4g/exec',
+    forceSyncOnLoad: true
+  };
+</script>
 
-  <script>
-    // App state
-    let menuList = [];
-    let cart = [];
+<script src="data/sheets-helper.js"
+        data-app-script-url="https://script.google.com/macros/s/AKfycbyep_2ZvPePJfNLAhsFteZnjRmxZ0cGPhzrorCUibVrKasE87gI5U9Ube6JSbXsBQdJ4g/exec"></script>
 
-    function formatRupiah(n){ return 'Rp ' + (n||0).toLocaleString('id-ID'); }
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    async function loadDataFromSheets(){
-      try{
-        menuList = await window.__three4five_sheets.getMenu();
-        renderMenu();
-        renderAdminMenuList();
-        console.log('[App] loaded menu from Sheets', menuList.length);
-      } catch(e){
-        console.error('[App] loadData error', e);
-        alert('Gagal memuat data dari Sheets. Periksa Console.');
-      }
+<script>
+  /* =========================================================
+     APP STATE
+     ========================================================= */
+  let menuList = [];
+  let cart = [];
+  let activeCategory = 'all';
+
+  function formatRupiah(n){
+    return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID');
+  }
+
+  function escapeHtml(value){
+    return String(value ?? '')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
+
+  function categoryName(category){
+    const c = String(category || '').toLowerCase();
+    if(c === 'ice-coffee') return 'Ice Coffee';
+    if(c === 'americano') return 'Americano';
+    if(c === 'non-coffee') return 'Non Coffee';
+    return category || 'Menu';
+  }
+
+  function showToast(message){
+    const toast = document.getElementById('toast-message');
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  /* =========================================================
+     DATE
+     ========================================================= */
+  function updateDate(){
+    const el = document.getElementById('current-date');
+    const now = new Date();
+    el.textContent = now.toLocaleDateString('id-ID',{
+      weekday:'short',
+      day:'2-digit',
+      month:'short',
+      year:'numeric'
+    });
+  }
+
+  /* =========================================================
+     LOAD DATA
+     ========================================================= */
+  async function loadDataFromSheets(){
+    try{
+      menuList = await window.__three4five_sheets.getMenu();
+      if(!Array.isArray(menuList)) menuList = [];
+
+      renderMenu();
+      renderAdminMenuList();
+
+      console.log('[App] loaded menu from Sheets', menuList.length);
+    }catch(e){
+      console.error('[App] loadData error', e);
+      showToast('Gagal memuat data dari Sheets');
+    }
+  }
+
+  /* =========================================================
+     MENU
+     ========================================================= */
+  function renderMenu(){
+    const grid = document.getElementById('menu-grid');
+    grid.innerHTML = '';
+
+    const filtered = activeCategory === 'all'
+      ? menuList
+      : menuList.filter(item => String(item.category || '').toLowerCase() === activeCategory);
+
+    document.getElementById('menu-count').textContent =
+      `${filtered.length} menu`;
+
+    if(!filtered.length){
+      grid.innerHTML = `
+        <div class="empty-menu">
+          <div style="font-size:28px;margin-bottom:8px">☕</div>
+          Tidak ada menu pada kategori ini.
+        </div>`;
+      return;
     }
 
-    function renderMenu(){
-      const grid = document.getElementById('menu-grid'); grid.innerHTML='';
-      if(!Array.isArray(menuList) || menuList.length===0){
-        grid.innerHTML='<div class="col-12 text-center text-muted py-4">Tidak ada menu.</div>'; return;
-      }
-      menuList.forEach(item => {
-        const col = document.createElement('div'); col.className='col-md-4';
-        col.innerHTML = `
-          <div class="card p-2">
-            <img src="${item.image||'https://via.placeholder.com/300x200'}" class="menu-img rounded mb-2" alt="">
-            <div class="fw-bold">${item.name||''}</div>
-            <div class="text-success">${formatRupiah(Number(item.price)||0)}</div>
-            <div class="mt-2"><button class="btn btn-outline-primary btn-sm" onclick="addToCart('${item.id}')">Tambah</button></div>
+    filtered.forEach(item => {
+      const col = document.createElement('div');
+      col.className = 'col-md-4';
+
+      const stock = Number(item.stock) || 0;
+      const image = item.image || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
+
+      col.innerHTML = `
+        <div class="menu-card">
+          <div class="menu-photo">
+            <img src="${escapeHtml(image)}" alt="${escapeHtml(item.name || 'Menu')}">
+            <span class="stock-badge">Stok ${stock}</span>
           </div>
-        `;
-        grid.appendChild(col);
+
+          <div class="menu-body">
+            <div class="menu-category">${escapeHtml(categoryName(item.category))}</div>
+            <div class="menu-name">${escapeHtml(item.name || '')}</div>
+
+            <div class="menu-footer">
+              <div class="menu-price">${formatRupiah(Number(item.price)||0)}</div>
+              <button class="add-btn" type="button" onclick="addToCart('${String(item.id).replace(/'/g,"\\'")}')">
+                + Tambah
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(col);
+    });
+  }
+
+  /* =========================================================
+     CATEGORY FILTER
+     ========================================================= */
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      activeCategory = this.dataset.category || 'all';
+      renderMenu();
+    });
+  });
+
+  /* =========================================================
+     CART
+     ========================================================= */
+  function addToCart(id){
+    const item = menuList.find(m => String(m.id) === String(id));
+    if(!item) return;
+
+    const ex = cart.find(c => String(c.id) === String(id));
+
+    if(ex){
+      ex.qty++;
+    }else{
+      cart.push({
+        id:item.id,
+        name:item.name,
+        price:Number(item.price)||0,
+        qty:1
       });
-      renderCart();
     }
 
-    function renderAdminMenuList(){
-      const el = document.getElementById('admin-menu-list'); el.innerHTML='';
-      if(!menuList.length){ el.innerHTML='<div class="text-muted">Tidak ada menu.</div>'; return; }
-      let html = '<table class="table table-sm"><thead><tr><th>Nama</th><th>Kategori</th><th>Harga</th><th>Stok</th></tr></thead><tbody>';
-      menuList.forEach(m=> html += `<tr><td>${m.name||''}</td><td>${m.category||''}</td><td>${formatRupiah(Number(m.price)||0)}</td><td>${m.stock||0}</td></tr>`);
-      html += '</tbody></table>'; el.innerHTML = html;
+    renderCart();
+    showToast(`${item.name} ditambahkan`);
+  }
+
+  function removeCart(idx){
+    cart.splice(idx,1);
+    renderCart();
+  }
+
+  function renderCart(){
+    const el = document.getElementById('cart-list');
+    const count = cart.reduce((sum,item)=>sum + item.qty,0);
+
+    document.getElementById('cart-count').textContent = count;
+
+    if(!cart.length){
+      el.innerHTML = `
+        <div class="empty-cart">
+          <div class="cart-empty-icon">🛒</div>
+          Belum ada menu yang dipilih
+        </div>`;
+
+      document.getElementById('subtotal-text').innerText = formatRupiah(0);
+      document.getElementById('total-text').innerText = formatRupiah(0);
+      document.getElementById('btn-pay').disabled = true;
+      return;
     }
 
-    function addToCart(id){
-      const item = menuList.find(m=>String(m.id)===String(id)); if(!item) return;
-      const ex = cart.find(c=>String(c.id)===String(id)); if(ex) ex.qty++; else cart.push({ id: item.id, name: item.name, price:Number(item.price)||0, qty:1 });
-      renderCart();
-    }
+    document.getElementById('btn-pay').disabled = false;
 
-    function renderCart(){
-      const el = document.getElementById('cart-list'); el.innerHTML=''; if(!cart.length){ el.innerText='Keranjang masih kosong.'; document.getElementById('subtotal-text').innerText = formatRupiah(0); document.getElementById('total-text').innerText = formatRupiah(0); return; }
-      let subtotal = 0; cart.forEach((c,idx)=>{ subtotal += c.price*c.qty; const row = document.createElement('div'); row.className='d-flex justify-content-between align-items-center mb-2'; row.innerHTML = `<div>${c.name} <small class="text-muted">x${c.qty}</small></div><div>${formatRupiah(c.price*c.qty)} <button class="btn btn-link btn-sm" onclick="removeCart(${idx})">hapus</button></div>`; el.appendChild(row); });
-      document.getElementById('subtotal-text').innerText = formatRupiah(subtotal);
-      document.getElementById('total-text').innerText = formatRupiah(subtotal);
-    }
+    let subtotal = 0;
+    el.innerHTML = '';
 
-    function removeCart(idx){ cart.splice(idx,1); renderCart(); }
+    cart.forEach((c,idx)=>{
+      const itemTotal = c.price * c.qty;
+      subtotal += itemTotal;
 
-    document.getElementById('btn-pay').addEventListener('click', async function(){
-      if(cart.length===0) return alert('Keranjang kosong');
-      const method = document.getElementById('payment-method').value;
-      const cash = Number(document.getElementById('cash-received').value) || 0;
-      const total = cart.reduce((s,i)=>s + (i.price*i.qty),0);
-      if(method==='Tunai' && cash < total) return alert('Uang tunai kurang');
-      const trx = { date: new Date().toISOString(), items: cart, method: method, total: total, cashReceived: method==='Tunai'?cash:total, change: method==='Tunai'?cash-total:0, timestamp: Date.now() };
-      try{
-        const r = await window.__three4five_sheets.addTransaction(trx);
-        if(r && r.ok){ alert('Transaksi tersimpan di Sheets'); cart = []; renderCart(); loadDataFromSheets(); } else alert('Gagal menyimpan transaksi');
-      } catch(e){ console.error(e); alert('Error saat menyimpan transaksi'); }
+      const row = document.createElement('div');
+      row.className = 'cart-item';
+
+      row.innerHTML = `
+        <div>
+          <div class="cart-item-name">${escapeHtml(c.name)}</div>
+          <div class="cart-item-meta">${c.qty} × ${formatRupiah(c.price)}</div>
+        </div>
+        <div class="cart-item-right">
+          <div class="cart-item-price">${formatRupiah(itemTotal)}</div>
+          <button class="remove-btn" type="button" onclick="removeCart(${idx})">hapus</button>
+        </div>
+      `;
+
+      el.appendChild(row);
     });
 
-    // Admin: add menu via Sheets (saveMenu will replace sheet data)
-    document.getElementById('add-menu-form').addEventListener('submit', async function(e){
-      e.preventDefault();
-      const name = document.getElementById('new-menu-name').value.trim();
-      const price = Number(document.getElementById('new-menu-price').value) || 0;
-      const stock = Number(document.getElementById('new-menu-stock').value) || 0;
-      const category = document.getElementById('new-menu-category').value;
-      const nextId = menuList.reduce((max,m)=>Math.max(max, Number(m.id)||0),0) + 1;
-      const newMenu = menuList.concat([{ id: nextId, name, price, stock, category }]);
-      try{
-        const r = await window.__three4five_sheets.saveMenu(newMenu);
-        if(r && r.ok){ alert('Menu tersimpan ke Sheets'); loadDataFromSheets(); document.getElementById('add-menu-form').reset(); } else alert('Gagal simpan menu');
-      } catch(err){ console.error(err); alert('Error saat menyimpan menu'); }
+    document.getElementById('subtotal-text').innerText = formatRupiah(subtotal);
+    document.getElementById('total-text').innerText = formatRupiah(subtotal);
+  }
+
+  /* =========================================================
+     PAYMENT METHOD
+     ========================================================= */
+  function getPaymentMethod(){
+    const checked = document.querySelector('input[name="payment"]:checked');
+    return checked ? checked.value : 'Tunai';
+  }
+
+  document.querySelectorAll('input[name="payment"]').forEach(input=>{
+    input.addEventListener('change',function(){
+      const method = getPaymentMethod();
+      document.getElementById('cash-wrap').classList.toggle('hidden', method !== 'Tunai');
+      if(method !== 'Tunai'){
+        document.getElementById('cash-received').value = '';
+      }
+    });
+  });
+
+  /* =========================================================
+     PAYMENT
+     ========================================================= */
+  document.getElementById('btn-pay').addEventListener('click', async function(){
+    if(cart.length === 0){
+      showToast('Keranjang masih kosong');
+      return;
+    }
+
+    const method = getPaymentMethod();
+    const cash = Number(document.getElementById('cash-received').value) || 0;
+    const total = cart.reduce((s,i)=>s + (i.price*i.qty),0);
+
+    if(method === 'Tunai' && cash < total){
+      showToast('Uang tunai kurang');
+      return;
+    }
+
+    const trx = {
+      date:new Date().toISOString(),
+      items:cart,
+      method:method,
+      total:total,
+      cashReceived:method === 'Tunai' ? cash : total,
+      change:method === 'Tunai' ? cash-total : 0,
+      timestamp:Date.now()
+    };
+
+    const btn = this;
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan...';
+
+    try{
+      const r = await window.__three4five_sheets.addTransaction(trx);
+
+      if(r && r.ok){
+        showToast('✓ Transaksi berhasil disimpan');
+        cart = [];
+        document.getElementById('cash-received').value = '';
+        renderCart();
+        loadDataFromSheets();
+      }else{
+        showToast('Gagal menyimpan transaksi');
+      }
+    }catch(e){
+      console.error(e);
+      showToast('Error saat menyimpan transaksi');
+    }finally{
+      btn.textContent = originalText;
+      if(cart.length) btn.disabled = false;
+    }
+  });
+
+  /* =========================================================
+     ADMIN
+     ========================================================= */
+  function renderAdminMenuList(){
+    const el = document.getElementById('admin-menu-list');
+
+    document.getElementById('admin-menu-count').textContent =
+      `${menuList.length} item`;
+
+    if(!menuList.length){
+      el.innerHTML = `
+        <div style="padding:35px;text-align:center;color:#9aa49f;font-size:11px">
+          Belum ada menu.
+        </div>`;
+      return;
+    }
+
+    let html = `
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Kategori</th>
+            <th>Harga</th>
+            <th>Stok</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    menuList.forEach(m=>{
+      html += `
+        <tr>
+          <td><strong>${escapeHtml(m.name || '')}</strong></td>
+          <td><span class="category-tag">${escapeHtml(categoryName(m.category))}</span></td>
+          <td><strong>${formatRupiah(Number(m.price)||0)}</strong></td>
+          <td class="stock-tag">${Number(m.stock)||0}</td>
+        </tr>
+      `;
     });
 
-    document.getElementById('nav-kasir').addEventListener('click', function(){ document.getElementById('view-kasir').classList.remove('hidden'); document.getElementById('view-admin').classList.add('hidden'); });
-    document.getElementById('nav-admin').addEventListener('click', function(){ document.getElementById('view-kasir').classList.add('hidden'); document.getElementById('view-admin').classList.remove('hidden'); });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
 
-    document.getElementById('reload-sheets').addEventListener('click', loadDataFromSheets);
-    document.getElementById('force-seed').addEventListener('click', function(){ if(window.__three4five_sheets && window.__three4five_sheets.getMenu) window.__three4five_sheets.getMenu().then(m=>{ localStorage.setItem('three4five_menu', JSON.stringify(m)); alert('Seeded local menu'); }).catch(e=>console.error(e)); });
+  document.getElementById('add-menu-form').addEventListener('submit', async function(e){
+    e.preventDefault();
 
-    // init
-    (function init(){
-      if(window.__three4five_config && window.__three4five_config.APP_SCRIPT_URL) window.__three4five_sheets.setAppScriptUrl(window.__three4five_config.APP_SCRIPT_URL);
-      loadDataFromSheets();
-    })();
-  </script>
+    const name = document.getElementById('new-menu-name').value.trim();
+    const price = Number(document.getElementById('new-menu-price').value) || 0;
+    const stock = Number(document.getElementById('new-menu-stock').value) || 0;
+    const category = document.getElementById('new-menu-category').value;
+
+    if(!name){
+      showToast('Nama menu wajib diisi');
+      return;
+    }
+
+    const nextId =
+      menuList.reduce((max,m)=>Math.max(max,Number(m.id)||0),0) + 1;
+
+    const newMenu = menuList.concat([{
+      id:nextId,
+      name,
+      price,
+      stock,
+      category
+    }]);
+
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const oldText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Menyimpan...';
+
+    try{
+      const r = await window.__three4five_sheets.saveMenu(newMenu);
+
+      if(r && r.ok){
+        showToast('✓ Menu berhasil disimpan');
+        await loadDataFromSheets();
+        this.reset();
+        document.getElementById('new-menu-stock').value = 50;
+      }else{
+        showToast('Gagal menyimpan menu');
+      }
+    }catch(err){
+      console.error(err);
+      showToast('Error saat menyimpan menu');
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = oldText;
+    }
+  });
+
+  document.getElementById('reload-sheets').addEventListener('click', async function(){
+    const old = this.textContent;
+    this.disabled = true;
+    this.textContent = 'Memuat...';
+
+    try{
+      await loadDataFromSheets();
+      showToast('Data berhasil diperbarui');
+    }finally{
+      this.disabled = false;
+      this.textContent = old;
+    }
+  });
+
+  document.getElementById('force-seed').addEventListener('click',function(){
+    if(window.__three4five_sheets && window.__three4five_sheets.getMenu){
+      window.__three4five_sheets.getMenu()
+        .then(m=>{
+          localStorage.setItem('three4five_menu',JSON.stringify(m));
+          showToast('Menu disimpan ke local storage');
+        })
+        .catch(e=>console.error(e));
+    }
+  });
+
+  /* =========================================================
+     NAVIGATION
+     ========================================================= */
+  function showView(view){
+    const kasir = document.getElementById('view-kasir');
+    const admin = document.getElementById('view-admin');
+    const navKasir = document.getElementById('nav-kasir');
+    const navAdmin = document.getElementById('nav-admin');
+
+    if(view === 'admin'){
+      kasir.classList.add('hidden');
+      admin.classList.remove('hidden');
+      navKasir.classList.remove('active');
+      navAdmin.classList.add('active');
+
+      document.getElementById('page-title').textContent = 'Admin & Menu';
+      document.getElementById('page-subtitle').textContent = 'Kelola produk, stok, dan data menu';
+    }else{
+      admin.classList.add('hidden');
+      kasir.classList.remove('hidden');
+      navAdmin.classList.remove('active');
+      navKasir.classList.add('active');
+
+      document.getElementById('page-title').textContent = 'Kasir';
+      document.getElementById('page-subtitle').textContent = 'Kelola pesanan dan pembayaran pelanggan';
+    }
+
+    document.getElementById('sidebar').classList.remove('open');
+  }
+
+  document.getElementById('nav-kasir').addEventListener('click',()=>showView('kasir'));
+  document.getElementById('nav-admin').addEventListener('click',()=>showView('admin'));
+
+  document.getElementById('mobile-menu').addEventListener('click',()=>{
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+
+  /* =========================================================
+     INIT
+     ========================================================= */
+  (function init(){
+    updateDate();
+
+    if(window.__three4five_config &&
+       window.__three4five_config.APP_SCRIPT_URL &&
+       window.__three4five_sheets &&
+       window.__three4five_sheets.setAppScriptUrl){
+
+      window.__three4five_sheets.setAppScriptUrl(
+        window.__three4five_config.APP_SCRIPT_URL
+      );
+    }
+
+    renderCart();
+    loadDataFromSheets();
+  })();
+</script>
+
 </body>
 </html>
