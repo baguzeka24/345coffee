@@ -88,7 +88,7 @@
   <!-- ==================== APP WRAPPER ==================== -->
   <div id="app-wrapper" class="hidden">
     
-    <!-- HEADER NAVBAR (Tanpa Tombol Admin, Hanya Logout) -->
+    <!-- HEADER NAVBAR (Tanpa Tombol Admin Navigasi, Hanya Logout) -->
     <div class="elegant-header">
       <div class="d-flex align-items-center gap-2">
         <h4 class="mb-0" style="color:var(--primary-green)">Three4Five Coffee</h4>
@@ -130,7 +130,7 @@
         </div>
       </section>
 
-      <!-- PANEL KELOLA DATA (Hanya muncul jika Role = Admin) -->
+      <!-- PANEL KELOLA DATA (Otomatis Tampil Jika Role = Admin) -->
       <section id="view-admin" class="hidden border-top pt-4">
         <h5 class="fw-bold mb-3 text-primary">Panel Admin / Kelola Data</h5>
         <div class="row g-4">
@@ -212,7 +212,7 @@
       }
     });
 
-    // LOGOUT: Kembali ke Login
+    // LOGOUT: Hapus Session dan Kembali ke Form Login
     document.getElementById('btn-logout').addEventListener('click', function() {
       localStorage.removeItem('three4five_user');
       currentUser = null;
@@ -233,7 +233,7 @@
 
       const adminSection = document.getElementById('view-admin');
       
-      // Jika login sebagai Admin, tampilkan section kelola data di bawah
+      // Tampilkan panel kelola data hanya jika login sebagai Admin
       if (currentUser.role === 'admin') {
         adminSection.classList.remove('hidden');
       } else {
@@ -246,12 +246,16 @@
     // ==================== INTEGRASI SPREADSHEET ====================
     async function loadDataFromSheets(){
       try{
-        menuList = await window.__three4five_sheets.getMenu();
-        renderMenu();
-        renderAdminMenuList();
+        if (window.__three4five_sheets && typeof window.__three4five_sheets.getMenu === 'function') {
+          menuList = await window.__three4five_sheets.getMenu();
+          renderMenu();
+          renderAdminMenuList();
+        } else {
+          console.warn('Sheets Helper belum siap. Menggunakan data cadangan.');
+        }
       } catch(e){
         console.error('[App] loadData error', e);
-        alert('Gagal memuat data dari Sheets.');
+        alert('Gagal memuat data dari Sheets. Pastikan Web App Apps Script sudah di-deploy dengan akses "Anyone".');
       }
     }
 
@@ -259,7 +263,7 @@
       const grid = document.getElementById('menu-grid');
       grid.innerHTML = '';
       if(!Array.isArray(menuList) || menuList.length===0){
-        grid.innerHTML='<div class="col-12 text-center text-muted py-4">Tidak ada menu.</div>';
+        grid.innerHTML='<div class="col-12 text-center text-muted py-4">Tidak ada menu atau data belum dimuat.</div>';
         return;
       }
       menuList.forEach(item => {
@@ -281,7 +285,7 @@
     function renderAdminMenuList(){
       const el = document.getElementById('admin-menu-list');
       el.innerHTML = '';
-      if(!menuList.length){
+      if(!menuList || !menuList.length){
         el.innerHTML = '<div class="text-muted">Tidak ada menu.</div>';
         return;
       }
@@ -355,7 +359,7 @@
         } else alert('Gagal menyimpan transaksi');
       } catch(e){
         console.error(e);
-        alert('Error saat menyimpan transaksi');
+        alert('Error saat menyimpan transaksi ke Google Sheets');
       }
     });
 
@@ -391,10 +395,12 @@
       }
     });
 
-    // Cek Session Saat Aplikasi Dimuat
+    // Inisialisasi Aplikasi Saat Dibuat
     (function init(){
       if(window.__three4five_config && window.__three4five_config.APP_SCRIPT_URL) {
-        window.__three4five_sheets.setAppScriptUrl(window.__three4five_config.APP_SCRIPT_URL);
+        if (window.__three4five_sheets && typeof window.__three4five_sheets.setAppScriptUrl === 'function') {
+          window.__three4five_sheets.setAppScriptUrl(window.__three4five_config.APP_SCRIPT_URL);
+        }
       }
       
       const savedUser = localStorage.getItem('three4five_user');
