@@ -167,13 +167,6 @@
     }
     .pay-btn:hover{background:var(--green-dark);transform:translateY(-1px)}
     .pay-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    .print-btn{
-      width:100%;height:40px;margin-top:8px;border:1px solid var(--green);
-      border-radius:11px;background:#fff;color:var(--green);font-size:10px;font-weight:800;
-      transition:.2s;
-    }
-    .print-btn:hover:not(:disabled){background:var(--green-soft);transform:translateY(-1px)}
-    .print-btn:disabled{opacity:.4;cursor:not-allowed;border-color:#cbd4d0;color:#87928e}
 
     /* ADMIN */
     .admin-grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:22px}
@@ -367,7 +360,6 @@
               </div>
 
               <button id="btn-pay" class="pay-btn" type="button">Proses Pembayaran</button>
-              <button id="btn-print" class="print-btn" type="button" disabled>🖨 Cetak Struk</button>
             </div>
           </aside>
 
@@ -458,7 +450,6 @@
   let menuList = [];
   let cart = [];
   let activeCategory = 'all';
-  let lastTransaction = null;
 
   function formatRupiah(n){
     return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID');
@@ -684,132 +675,6 @@
     });
   });
 
-  function buildReceiptHtml(trx){
-    const date = new Date(trx.date || Date.now());
-    const dateText = date.toLocaleString('id-ID', {
-      day:'2-digit', month:'2-digit', year:'numeric',
-      hour:'2-digit', minute:'2-digit'
-    });
-
-    const items = Array.isArray(trx.items) ? trx.items : [];
-    const itemRows = items.map(item => `
-      <tr>
-        <td>${escapeHtml(item.name || '')}</td>
-        <td class="qty">${Number(item.qty) || 0}</td>
-        <td class="price">${formatRupiah((Number(item.price)||0) * (Number(item.qty)||0))}</td>
-      </tr>
-    `).join('');
-
-    const cash = Number(trx.cashReceived) || 0;
-    const change = Number(trx.change) || 0;
-
-    return `<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<title>Struk Three4Five Coffee</title>
-<style>
-  *{box-sizing:border-box}
-  body{font-family:Arial,sans-serif;background:#fff;color:#111;margin:0;padding:20px}
-  .receipt{width:320px;margin:0 auto}
-  .center{text-align:center}
-  h1{font-size:19px;margin:0 0 4px}
-  .muted{font-size:10px;color:#666}
-  .line{border-top:1px dashed #999;margin:12px 0}
-  table{width:100%;border-collapse:collapse;font-size:11px}
-  th{text-align:left;font-size:9px;padding-bottom:6px}
-  td{padding:5px 0;vertical-align:top}
-  .qty{text-align:center;width:35px}
-  .price{text-align:right;white-space:nowrap}
-  .total{font-size:15px;font-weight:700}
-  .row{display:flex;justify-content:space-between;font-size:11px;margin:5px 0}
-  .footer{margin-top:15px;text-align:center;font-size:10px;color:#666}
-  @media print{
-    body{padding:0}
-    .receipt{width:80mm}
-    @page{size:80mm auto;margin:5mm}
-  }
-</style>
-</head>
-<body>
-  <div class="receipt">
-    <div class="center">
-      <h1>Three4Five Coffee</h1>
-      <div class="muted">Coffee & POS</div>
-      <div class="muted">${dateText}</div>
-    </div>
-
-    <div class="line"></div>
-
-    <table>
-      <thead>
-        <tr><th>Menu</th><th class="qty">Qty</th><th class="price">Total</th></tr>
-      </thead>
-      <tbody>${itemRows}</tbody>
-    </table>
-
-    <div class="line"></div>
-
-    <div class="row">
-      <span>Subtotal</span>
-      <strong>${formatRupiah(trx.total)}</strong>
-    </div>
-    <div class="row">
-      <span>Pajak</span>
-      <strong>Rp 0</strong>
-    </div>
-    <div class="row total">
-      <span>TOTAL</span>
-      <span>${formatRupiah(trx.total)}</span>
-    </div>
-    <div class="row">
-      <span>Pembayaran</span>
-      <strong>${escapeHtml(trx.method || 'Tunai')}</strong>
-    </div>
-    ${trx.method === 'Tunai' ? `
-    <div class="row">
-      <span>Tunai</span>
-      <strong>${formatRupiah(cash)}</strong>
-    </div>
-    <div class="row">
-      <span>Kembalian</span>
-      <strong>${formatRupiah(change)}</strong>
-    </div>` : ''}
-
-    <div class="line"></div>
-    <div class="footer">
-      Terima kasih telah berkunjung<br>
-      Three4Five Coffee
-    </div>
-  </div>
-<script>
-  window.onload = function(){ window.print(); };
-</script>
-</body>
-</html>`;
-  }
-
-  function printReceipt(trx){
-    if(!trx) {
-      showToast('Belum ada transaksi untuk dicetak');
-      return;
-    }
-
-    const printWindow = window.open('', '_blank', 'width=430,height=700');
-    if(!printWindow){
-      showToast('Popup diblokir browser. Izinkan popup untuk mencetak.');
-      return;
-    }
-
-    printWindow.document.open();
-    printWindow.document.write(buildReceiptHtml(trx));
-    printWindow.document.close();
-  }
-
-  document.getElementById('btn-print').addEventListener('click', function(){
-    printReceipt(lastTransaction);
-  });
-
   /* =========================================================
      PAYMENT
      ========================================================= */
@@ -848,11 +713,6 @@
 
       if(r && r.ok){
         showToast('✓ Transaksi berhasil disimpan');
-
-        // Simpan transaksi terakhir agar dapat langsung dicetak.
-        lastTransaction = trx;
-        document.getElementById('btn-print').disabled = false;
-
         cart = [];
         document.getElementById('cash-received').value = '';
         renderCart();
