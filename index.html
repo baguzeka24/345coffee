@@ -145,9 +145,12 @@
     .summary{padding-top:15px}
     .summary-row{display:flex;justify-content:space-between;font-size:11px;color:#69736f;margin-bottom:9px}
     .summary-row strong{color:var(--text)}
-    .summary-total{display:flex;justify-content:space-between;align-items:end;border-top:1px dashed #dce2df;padding-top:14px;margin-top:5px;margin-bottom:18px}
+    .summary-total{display:flex;justify-content:space-between;align-items:end;border-top:1px dashed #dce2df;padding-top:14px;margin-top:5px;margin-bottom:14px}
     .summary-total span{font-size:11px;color:var(--muted)}
     .summary-total strong{font-family:'Poppins',sans-serif;font-size:22px;color:var(--green)}
+
+    .change-row{display:flex;justify-content:space-between;align-items:center;background:var(--green-soft);padding:10px 12px;border-radius:10px;margin-bottom:14px;font-size:11px;color:var(--green-dark)}
+    .change-row strong{font-size:13px;font-weight:800}
 
     .payment-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#7c8883;font-weight:800;margin-bottom:8px}
     .payment-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
@@ -167,35 +170,6 @@
     }
     .pay-btn:hover{background:var(--green-dark);transform:translateY(-1px)}
     .pay-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-
-    /* ADMIN */
-    .admin-grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:22px}
-    .panel{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
-    .panel-head{padding:17px 19px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-    .panel-head h3{font-family:'Poppins',sans-serif;font-size:14px;margin:0}
-    .panel-body{padding:19px}
-    .form-label-custom{font-size:10px;font-weight:700;color:#69746f;margin-bottom:6px;display:block}
-    .custom-input,.custom-select{
-      width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:0 11px;
-      outline:none;font-size:11px;background:#fff;margin-bottom:13px;
-    }
-    .custom-input:focus,.custom-select:focus{border-color:#83a99c;box-shadow:0 0 0 3px rgba(6,78,59,.07)}
-    .save-btn{width:100%;height:42px;border:0;background:var(--green);color:#fff;border-radius:10px;font-size:11px;font-weight:800}
-    .sync-box{border-top:1px solid var(--line);margin-top:18px;padding-top:17px}
-    .sync-btn{
-      width:100%;height:39px;border:1px solid var(--line);background:#fff;color:#5f6d67;
-      border-radius:9px;font-size:10px;font-weight:700;margin-bottom:8px;
-    }
-    .sync-btn:hover{border-color:#aabdb5;background:#f7faf8}
-    .sync-btn.debug{border-color:#d8dedb}
-
-    .table-wrap{overflow:auto}
-    .admin-table{width:100%;border-collapse:collapse}
-    .admin-table th{background:#f7f9f8;color:#87928e;font-size:9px;text-transform:uppercase;letter-spacing:.7px;padding:11px 12px;text-align:left;white-space:nowrap}
-    .admin-table td{border-bottom:1px solid #eef1ef;padding:12px;font-size:10px;vertical-align:middle}
-    .admin-table tr:last-child td{border-bottom:0}
-    .category-tag{background:var(--green-soft);color:var(--green);padding:5px 8px;border-radius:7px;font-size:8px;font-weight:800}
-    .stock-tag{font-weight:700}
 
     /* TOAST */
     .toast-message{
@@ -220,7 +194,6 @@
       .content{padding:20px 18px 30px}
       .pos-layout{grid-template-columns:1fr}
       .cart-panel{position:relative;top:0}
-      .admin-grid{grid-template-columns:1fr}
     }
     @media(max-width:560px){
       .topbar{height:68px}
@@ -258,10 +231,6 @@
       <button id="nav-kasir" class="active" type="button">
         <span class="nav-icon">▣</span>
         <span>Kasir</span>
-      </button>
-      <button id="nav-admin" type="button">
-        <span class="nav-icon">⚙</span>
-        <span>Admin & Menu</span>
       </button>
     </nav>
 
@@ -342,6 +311,11 @@
                 <strong id="total-text">Rp 0</strong>
               </div>
 
+              <div class="change-row" id="change-row">
+                <span>Kembalian</span>
+                <strong id="change-text">Rp 0</strong>
+              </div>
+
               <div class="payment-title">Metode Pembayaran</div>
 
               <div class="payment-options">
@@ -362,62 +336,6 @@
               <button id="btn-pay" class="pay-btn" type="button">Proses Pembayaran</button>
             </div>
           </aside>
-
-        </div>
-      </section>
-
-      <!-- ADMIN VIEW -->
-      <section id="view-admin" class="hidden">
-        <div class="section-head">
-          <div>
-            <h2>Manajemen Menu</h2>
-            <span>Kelola daftar produk Three4Five Coffee</span>
-          </div>
-        </div>
-
-        <div class="admin-grid">
-
-          <div class="panel">
-            <div class="panel-head">
-              <h3>Tambah Menu</h3>
-            </div>
-            <div class="panel-body">
-              <form id="add-menu-form">
-                <label class="form-label-custom" for="new-menu-name">Nama Menu</label>
-                <input id="new-menu-name" class="custom-input" placeholder="Contoh: Ice Latte" required>
-
-                <label class="form-label-custom" for="new-menu-price">Harga</label>
-                <input id="new-menu-price" class="custom-input" placeholder="Contoh: 18000" type="number" min="0" required>
-
-                <label class="form-label-custom" for="new-menu-stock">Stok</label>
-                <input id="new-menu-stock" class="custom-input" placeholder="Jumlah stok" type="number" min="0" value="50">
-
-                <label class="form-label-custom" for="new-menu-category">Kategori</label>
-                <select id="new-menu-category" class="custom-select">
-                  <option value="ice-coffee">Ice Coffee</option>
-                  <option value="americano">Americano</option>
-                  <option value="non-coffee">Non Coffee</option>
-                </select>
-
-                <button class="save-btn" type="submit">＋ Simpan ke Sheets</button>
-              </form>
-
-              <div class="sync-box">
-                <button id="reload-sheets" class="sync-btn" type="button">↻ Reload dari Sheets</button>
-                <button id="force-seed" class="sync-btn debug" type="button">Local Seed / Debug</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <h3>Daftar Menu</h3>
-              <span id="admin-menu-count" style="font-size:10px;color:#87928e">0 item</span>
-            </div>
-            <div class="table-wrap">
-              <div id="admin-menu-list"></div>
-            </div>
-          </div>
 
         </div>
       </section>
@@ -503,7 +421,6 @@
       if(!Array.isArray(menuList)) menuList = [];
 
       renderMenu();
-      renderAdminMenuList();
 
       console.log('[App] loaded menu from Sheets', menuList.length);
     }catch(e){
@@ -623,6 +540,7 @@
 
       document.getElementById('subtotal-text').innerText = formatRupiah(0);
       document.getElementById('total-text').innerText = formatRupiah(0);
+      document.getElementById('change-text').innerText = formatRupiah(0);
       document.getElementById('btn-pay').disabled = true;
       return;
     }
@@ -655,25 +573,52 @@
 
     document.getElementById('subtotal-text').innerText = formatRupiah(subtotal);
     document.getElementById('total-text').innerText = formatRupiah(subtotal);
+    
+    calculateChange();
   }
 
   /* =========================================================
-     PAYMENT METHOD
+     PAYMENT METHOD & CHANGE CALCULATION
      ========================================================= */
   function getPaymentMethod(){
     const checked = document.querySelector('input[name="payment"]:checked');
     return checked ? checked.value : 'Tunai';
   }
 
+  function calculateChange(){
+    const method = getPaymentMethod();
+    const total = cart.reduce((s,i)=>s + (i.price*i.qty),0);
+    const cashInput = document.getElementById('cash-received');
+    const changeText = document.getElementById('change-text');
+    const changeRow = document.getElementById('change-row');
+
+    if(method !== 'Tunai'){
+      changeText.innerText = formatRupiah(0);
+      return;
+    }
+
+    const cash = Number(cashInput.value) || 0;
+    const change = cash >= total ? cash - total : 0;
+    changeText.innerText = formatRupiah(change);
+  }
+
   document.querySelectorAll('input[name="payment"]').forEach(input=>{
     input.addEventListener('change',function(){
       const method = getPaymentMethod();
-      document.getElementById('cash-wrap').classList.toggle('hidden', method !== 'Tunai');
+      const cashWrap = document.getElementById('cash-wrap');
+      const changeRow = document.getElementById('change-row');
+      
+      cashWrap.classList.toggle('hidden', method !== 'Tunai');
+      changeRow.classList.toggle('hidden', method !== 'Tunai');
+      
       if(method !== 'Tunai'){
         document.getElementById('cash-received').value = '';
       }
+      calculateChange();
     });
   });
+
+  document.getElementById('cash-received').addEventListener('input', calculateChange);
 
   /* =========================================================
      PAYMENT
@@ -730,181 +675,26 @@
   });
 
   /* =========================================================
-     ADMIN
+     NAVIGASI & SHELL
      ========================================================= */
-  function renderAdminMenuList(){
-    const el = document.getElementById('admin-menu-list');
+  const sidebar = document.getElementById('sidebar');
+  const mobileMenuBtn = document.getElementById('mobile-menu');
 
-    document.getElementById('admin-menu-count').textContent =
-      `${menuList.length} item`;
-
-    if(!menuList.length){
-      el.innerHTML = `
-        <div style="padding:35px;text-align:center;color:#9aa49f;font-size:11px">
-          Belum ada menu.
-        </div>`;
-      return;
-    }
-
-    let html = `
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Kategori</th>
-            <th>Harga</th>
-            <th>Stok</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    menuList.forEach(m=>{
-      html += `
-        <tr>
-          <td><strong>${escapeHtml(m.name || '')}</strong></td>
-          <td><span class="category-tag">${escapeHtml(categoryName(m.category))}</span></td>
-          <td><strong>${formatRupiah(Number(m.price)||0)}</strong></td>
-          <td class="stock-tag">${Number(m.stock)||0}</td>
-        </tr>
-      `;
-    });
-
-    html += '</tbody></table>';
-    el.innerHTML = html;
-  }
-
-  document.getElementById('add-menu-form').addEventListener('submit', async function(e){
-    e.preventDefault();
-
-    const name = document.getElementById('new-menu-name').value.trim();
-    const price = Number(document.getElementById('new-menu-price').value) || 0;
-    const stock = Number(document.getElementById('new-menu-stock').value) || 0;
-    const category = document.getElementById('new-menu-category').value;
-
-    if(!name){
-      showToast('Nama menu wajib diisi');
-      return;
-    }
-
-    const nextId =
-      menuList.reduce((max,m)=>Math.max(max,Number(m.id)||0),0) + 1;
-
-    const newMenu = menuList.concat([{
-      id:nextId,
-      name,
-      price,
-      stock,
-      category
-    }]);
-
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const oldText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Menyimpan...';
-
-    try{
-      const r = await window.__three4five_sheets.saveMenu(newMenu);
-
-      if(r && r.ok){
-        showToast('✓ Menu berhasil disimpan');
-        await loadDataFromSheets();
-        this.reset();
-        document.getElementById('new-menu-stock').value = 50;
-      }else{
-        showToast('Gagal menyimpan menu');
-      }
-    }catch(err){
-      console.error(err);
-      showToast('Error saat menyimpan menu');
-    }finally{
-      submitBtn.disabled = false;
-      submitBtn.textContent = oldText;
-    }
-  });
-
-  document.getElementById('reload-sheets').addEventListener('click', async function(){
-    const old = this.textContent;
-    this.disabled = true;
-    this.textContent = 'Memuat...';
-
-    try{
-      await loadDataFromSheets();
-      showToast('Data berhasil diperbarui');
-    }finally{
-      this.disabled = false;
-      this.textContent = old;
-    }
-  });
-
-  document.getElementById('force-seed').addEventListener('click',function(){
-    if(window.__three4five_sheets && window.__three4five_sheets.getMenu){
-      window.__three4five_sheets.getMenu()
-        .then(m=>{
-          localStorage.setItem('three4five_menu',JSON.stringify(m));
-          showToast('Menu disimpan ke local storage');
-        })
-        .catch(e=>console.error(e));
-    }
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('open');
   });
 
   /* =========================================================
-     NAVIGATION
+     INITIALIZATION
      ========================================================= */
-  function showView(view){
-    const kasir = document.getElementById('view-kasir');
-    const admin = document.getElementById('view-admin');
-    const navKasir = document.getElementById('nav-kasir');
-    const navAdmin = document.getElementById('nav-admin');
-
-    if(view === 'admin'){
-      kasir.classList.add('hidden');
-      admin.classList.remove('hidden');
-      navKasir.classList.remove('active');
-      navAdmin.classList.add('active');
-
-      document.getElementById('page-title').textContent = 'Admin & Menu';
-      document.getElementById('page-subtitle').textContent = 'Kelola produk, stok, dan data menu';
-    }else{
-      admin.classList.add('hidden');
-      kasir.classList.remove('hidden');
-      navAdmin.classList.remove('active');
-      navKasir.classList.add('active');
-
-      document.getElementById('page-title').textContent = 'Kasir';
-      document.getElementById('page-subtitle').textContent = 'Kelola pesanan dan pembayaran pelanggan';
-    }
-
-    document.getElementById('sidebar').classList.remove('open');
-  }
-
-  document.getElementById('nav-kasir').addEventListener('click',()=>showView('kasir'));
-  document.getElementById('nav-admin').addEventListener('click',()=>showView('admin'));
-
-  document.getElementById('mobile-menu').addEventListener('click',()=>{
-    document.getElementById('sidebar').classList.toggle('open');
-  });
-
-  /* =========================================================
-     INIT
-     ========================================================= */
-  (function init(){
+  document.addEventListener('DOMContentLoaded', async function() {
     updateDate();
-
-    if(window.__three4five_config &&
-       window.__three4five_config.APP_SCRIPT_URL &&
-       window.__three4five_sheets &&
-       window.__three4five_sheets.setAppScriptUrl){
-
-      window.__three4five_sheets.setAppScriptUrl(
-        window.__three4five_config.APP_SCRIPT_URL
-      );
-    }
-
     renderCart();
-    loadDataFromSheets();
-  })();
+    
+    if (window.__three4five_config && window.__three4five_config.forceSyncOnLoad) {
+      await loadDataFromSheets();
+    }
+  });
 </script>
-
 </body>
 </html>
