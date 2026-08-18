@@ -175,11 +175,19 @@
     .pay-btn:hover { background: var(--brand-dark); transform: translateY(-1px); }
     .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    /* DRIVE HELPER INFO */
-    .drive-info-box {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 11px; color: var(--text-muted); margin-top: 6px;
+    /* IMAGE UPLOAD & PREVIEW STYLES */
+    .image-upload-wrapper {
+      border: 2px dashed var(--border-color); border-radius: 10px; padding: 14px;
+      text-align: center; background: #fafafa; transition: all 0.2s ease; cursor: pointer;
     }
-    .drive-info-box code { color: var(--brand-main); font-weight: 700; font-size: 11px; }
+    .image-upload-wrapper:hover { border-color: var(--brand-accent); background: var(--brand-soft); }
+    .image-preview-container { margin-top: 10px; position: relative; display: inline-block; width: 100%; }
+    .image-preview-container img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); }
+    .btn-remove-preview {
+      position: absolute; top: 6px; right: 6px; background: rgba(239, 68, 68, 0.9);
+      color: #fff; border: 0; width: 24px; height: 24px; border-radius: 50%;
+      font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold;
+    }
 
     /* TOAST */
     .toast-message {
@@ -385,13 +393,24 @@
             </select>
           </div>
 
+          <!-- FITUR UPLOAD GAMBAR BARU -->
           <div class="mb-2">
-            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Link Gambar / Link Google Drive</label>
-            <input type="text" id="add-image" class="form-control" style="border-radius: 8px; font-size: 13px;" placeholder="Paste link Google Drive atau URL Gambar...">
-            <div class="drive-info-box">
-              💡 <strong>Tips Google Drive:</strong> Cukup tempel link share Drive (contoh: <code>https://drive.google.com/file/d/1ABC.../view</code>). System akan otomatis mengonversinya menjadi URL gambar langsung!
+            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Upload Gambar Menu</label>
+            <div class="image-upload-wrapper" onclick="document.getElementById('add-image-file').click()">
+              <input type="file" id="add-image-file" accept="image/*" style="display: none;" onchange="handleImageUpload(this, 'add-preview-container', 'add-preview-img', 'add-image-base64')">
+              <input type="hidden" id="add-image-base64">
+              <div id="add-upload-placeholder">
+                <div style="font-size: 24px; margin-bottom: 4px;">📁</div>
+                <span style="font-size: 12px; font-weight: 600; color: var(--brand-main);">Klik untuk Pilih Gambar</span>
+                <p style="font-size: 10px; color: var(--text-muted); margin: 2px 0 0;">Format JPG, PNG, WEBP (Maks 2MB)</p>
+              </div>
+              <div id="add-preview-container" class="image-preview-container hidden">
+                <img id="add-preview-img" src="" alt="Preview">
+                <button type="button" class="btn-remove-preview" onclick="removeImageUpload(event, 'add-image-file', 'add-preview-container', 'add-upload-placeholder', 'add-image-base64')">×</button>
+              </div>
             </div>
           </div>
+
         </div>
         <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid var(--border-color); padding: 12px 20px;">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600; font-size: 12px;">Batal</button>
@@ -439,13 +458,23 @@
             </select>
           </div>
 
+          <!-- FITUR UPLOAD GAMBAR EDIT -->
           <div class="mb-2">
-            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Link Gambar / Link Google Drive</label>
-            <input type="text" id="edit-image" class="form-control" style="border-radius: 8px; font-size: 13px;" placeholder="Paste link Google Drive atau URL Gambar...">
-            <div class="drive-info-box">
-              💡 <strong>Tips Google Drive:</strong> Bisa langsung menempelkan URL share Google Drive.
+            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Upload Gambar Menu Baru (Opsional)</label>
+            <div class="image-upload-wrapper" onclick="document.getElementById('edit-image-file').click()">
+              <input type="file" id="edit-image-file" accept="image/*" style="display: none;" onchange="handleImageUpload(this, 'edit-preview-container', 'edit-preview-img', 'edit-image-base64')">
+              <input type="hidden" id="edit-image-base64">
+              <div id="edit-upload-placeholder" class="hidden">
+                <div style="font-size: 24px; margin-bottom: 4px;">📁</div>
+                <span style="font-size: 12px; font-weight: 600; color: var(--brand-main);">Klik untuk Ganti Gambar</span>
+              </div>
+              <div id="edit-preview-container" class="image-preview-container">
+                <img id="edit-preview-img" src="" alt="Preview">
+                <button type="button" class="btn-remove-preview" onclick="removeImageUpload(event, 'edit-image-file', 'edit-preview-container', 'edit-upload-placeholder', 'edit-image-base64')">×</button>
+              </div>
             </div>
           </div>
+
         </div>
         <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid var(--border-color); padding: 12px 20px;">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600; font-size: 12px;">Batal</button>
@@ -537,15 +566,57 @@
       .replace(/'/g,'&#039;');
   }
 
-  /* UTILITY: KONVERSI LINK GOOGLE DRIVE KE DIRECT IMAGE URL */
-  function convertDriveUrl(url) {
-    if (!url) return '';
-    const driveRegex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)|lh3\.googleusercontent\.com\/d\/)([a-zA-Z0-9_-]+)/;
-    const match = url.match(driveRegex);
-    if (match && match[1]) {
-      return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+  /* UTILITY: HANDLING UPLOAD & COMPRESS FILE GAMBAR DENGAN BASE64 */
+  function handleImageUpload(inputEl, containerId, previewImgId, hiddenBase64Id) {
+    const file = inputEl.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Ukuran file terlalu besar (Maks 5MB)');
+      inputEl.value = '';
+      return;
     }
-    return url;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        // Compress Canvas
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 600;
+        const scaleSize = MAX_WIDTH / img.width;
+        canvas.width = (img.width > MAX_WIDTH) ? MAX_WIDTH : img.width;
+        canvas.height = (img.width > MAX_WIDTH) ? img.height * scaleSize : img.height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+
+        document.getElementById(hiddenBase64Id).value = resizedBase64;
+        document.getElementById(previewImgId).src = resizedBase64;
+
+        const container = document.getElementById(containerId);
+        container.classList.remove('hidden');
+
+        // Sembunyikan placeholder upload jika ada
+        const placeholderId = containerId.replace('-preview-container', '-upload-placeholder');
+        const placeholder = document.getElementById(placeholderId);
+        if(placeholder) placeholder.classList.add('hidden');
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImageUpload(event, fileInputId, containerId, placeholderId, hiddenBase64Id) {
+    event.stopPropagation();
+    document.getElementById(fileInputId).value = '';
+    document.getElementById(hiddenBase64Id).value = '';
+    document.getElementById(containerId).classList.add('hidden');
+    
+    const placeholder = document.getElementById(placeholderId);
+    if(placeholder) placeholder.classList.remove('hidden');
   }
 
   function categoryName(category){
@@ -616,8 +687,7 @@
       col.className = 'col-md-4';
 
       const stock = Number(item.stock) || 0;
-      const rawImg = item.image || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
-      const image = convertDriveUrl(rawImg);
+      const image = item.image || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
 
       col.innerHTML = `
         <div class="menu-card">
@@ -663,14 +733,17 @@
      ========================================================= */
   function openAddMenuModal(){
     document.getElementById('form-add-menu').reset();
+    document.getElementById('add-image-base64').value = '';
+    document.getElementById('add-preview-container').classList.add('hidden');
+    document.getElementById('add-upload-placeholder').classList.remove('hidden');
     addMenuModalInstance.show();
   }
 
   document.getElementById('form-add-menu').addEventListener('submit', async function(e){
     e.preventDefault();
 
-    const rawImageInput = document.getElementById('add-image').value.trim();
-    const finalImage = convertDriveUrl(rawImageInput);
+    const imageBase64 = document.getElementById('add-image-base64').value;
+    const finalImage = imageBase64 || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
 
     const newMenuData = {
       id: 'MNU-' + Date.now().toString().slice(-6),
@@ -728,7 +801,19 @@
     document.getElementById('edit-price').value = Number(item.price) || 0;
     document.getElementById('edit-stock').value = Number(item.stock) || 0;
     document.getElementById('edit-category').value = String(item.category || 'ice-coffee').toLowerCase();
-    document.getElementById('edit-image').value = item.image || '';
+    
+    // Set preview gambar eksis
+    const currentImg = item.image || '';
+    document.getElementById('edit-image-base64').value = currentImg;
+    
+    if (currentImg) {
+      document.getElementById('edit-preview-img').src = currentImg;
+      document.getElementById('edit-preview-container').classList.remove('hidden');
+      document.getElementById('edit-upload-placeholder').classList.add('hidden');
+    } else {
+      document.getElementById('edit-preview-container').classList.add('hidden');
+      document.getElementById('edit-upload-placeholder').classList.remove('hidden');
+    }
 
     editMenuModalInstance.show();
   }
@@ -737,8 +822,7 @@
     e.preventDefault();
 
     const id = document.getElementById('edit-id').value;
-    const rawImageInput = document.getElementById('edit-image').value.trim();
-    const finalImage = convertDriveUrl(rawImageInput);
+    const finalImage = document.getElementById('edit-image-base64').value || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
 
     const updatedData = {
       id: id,
