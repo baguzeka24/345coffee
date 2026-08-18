@@ -3,1094 +3,193 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three4Five Coffee — Pro Terminal POS</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <title>Kasir POS - Three4Five Coffee</title>
   <style>
-    :root {
-      --brand-dark: #061e16;
-      --brand-main: #0c3b2e;
-      --brand-surface: #124e3d;
-      --brand-accent: #10b981;
-      --brand-soft: #e8f5f1;
-      --bg-main: #f3f5f6;
-      --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-      --shadow-md: 0 10px 25px -5px rgba(12, 59, 46, 0.08);
-      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
-      --radius: 14px;
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: var(--text-main); }
-    button, input, select { font-family: inherit; }
-    button { cursor: pointer; }
-    .hidden { display: none !important; }
-
-    /* LAYOUT & HEADER */
-    .app-shell { min-height: 100vh; display: flex; flex-direction: column; }
-
-    .topbar {
-      height: 72px; background: var(--brand-dark); color: #fff;
-      border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center;
-      justify-content: space-between; padding: 0 32px; position: sticky; top: 0; z-index: 1000;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    }
-
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-icon {
-      width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #22c55e, #0c3b2e);
-      color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    }
-    .brand-text strong { font-family: 'Space Grotesk', sans-serif; font-size: 18px; display: block; letter-spacing: -0.3px; color: #fff; line-height: 1.1; }
-    .brand-text span { font-size: 10px; color: var(--brand-accent); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
-
-    .cashier-info { display: flex; align-items: center; gap: 16px; }
-    .date-pill { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); padding: 7px 16px; border-radius: 30px; font-size: 12px; color: #cbd5e1; font-weight: 600; }
-    .cashier-badge { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 5px 12px 5px 6px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.08); }
-    .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; }
-    .cashier-badge span { font-size: 12px; font-weight: 600; color: #f1f5f9; }
-
-    .content { padding: 24px 32px; flex: 1; }
-
-    /* KASIR POS GRID LAYOUT */
-    .pos-layout { display: grid; grid-template-columns: minmax(0, 1fr) 410px; gap: 24px; align-items: start; }
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { display: flex; gap: 20px; padding: 20px; margin: 0; background-color: #f4f4f9; }
     
-    .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .section-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin: 0; font-weight: 700; color: var(--brand-dark); }
-    .head-actions { display: flex; align-items: center; gap: 10px; }
-    .section-head span.badge-count { font-size: 12px; color: var(--text-muted); background: #e2e8f0; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
-
-    .btn-add-menu {
-      background: var(--brand-accent); color: #fff; border: 0; padding: 6px 14px;
-      border-radius: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px;
-      transition: all 0.2s; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
-    }
-    .btn-add-menu:hover { background: #059669; transform: translateY(-1px); }
-
-    .category-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
-    .category-bar::-webkit-scrollbar { display: none; }
-    .category-btn {
-      border: 1px solid var(--border-color); background: #fff; color: var(--text-muted);
-      padding: 9px 18px; border-radius: 10px; font-size: 12px; font-weight: 700;
-      white-space: nowrap; transition: all 0.2s; box-shadow: var(--shadow-sm);
-    }
-    .category-btn:hover, .category-btn.active { background: var(--brand-main); border-color: var(--brand-main); color: #fff; box-shadow: 0 4px 12px rgba(12, 59, 46, 0.2); }
-
-    /* MENU GRID */
-    .menu-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
-    .menu-grid > .col-md-4 { width: auto; padding: 0 !important; }
-    .menu-card {
-      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden;
-      box-shadow: var(--shadow-sm); transition: all 0.2s ease; height: 100%; display: flex; flex-direction: column; position: relative;
-    }
-    .menu-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(12, 59, 46, 0.2); }
-    .menu-photo { height: 140px; position: relative; background: #e2e8f0; overflow: hidden; }
-    .menu-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
-    .menu-card:hover .menu-photo img { transform: scale(1.05); }
+    /* Layout Utama */
+    .section-menu { flex: 2; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .section-cart { flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     
-    .stock-badge {
-      position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(4px);
-      padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; color: var(--brand-main); box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
+    /* Grid Menu */
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 15px; }
+    .menu-card { border: 1px solid #ddd; padding: 15px; border-radius: 6px; text-align: center; cursor: pointer; background: #fafafa; transition: 0.2s; }
+    .menu-card:hover { background: #eef; border-color: #007bff; }
+    .menu-card h4 { margin: 0 0 8px 0; font-size: 16px; }
+    .menu-card p { margin: 0; color: #28a745; font-weight: bold; }
     
-    /* EDIT BUTTON FLOATING ON CARD */
-    .edit-menu-btn {
-      position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px);
-      color: #fff; border: 0; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
-      font-size: 12px; transition: all 0.2s; z-index: 5;
-    }
-    .edit-menu-btn:hover { background: var(--brand-dark); transform: scale(1.1); }
-
-    .menu-body { padding: 14px; display: flex; flex-direction: column; flex: 1; }
-    .menu-category { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--brand-accent); font-weight: 800; margin-bottom: 3px; }
-    .menu-name { font-size: 13px; font-weight: 700; margin-bottom: 10px; line-height: 1.3; color: var(--text-main); }
-    .menu-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 8px; }
-    .menu-price { font-size: 14px; font-weight: 800; color: var(--brand-main); }
+    /* List Keranjang */
+    .cart-list { list-style: none; padding: 0; margin: 15px 0; max-height: 300px; overflow-y: auto; }
+    .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .total-box { font-size: 18px; font-weight: bold; margin-top: 15px; text-align: right; }
     
-    .add-btn {
-      border: 0; background: var(--brand-soft); color: var(--brand-main); border-radius: 8px; padding: 7px 12px;
-      font-size: 11px; font-weight: 700; transition: all 0.2s;
-    }
-    .add-btn:hover { background: var(--brand-main); color: #fff; }
-    .empty-menu { grid-column: 1 / -1; background: #fff; border: 2px dashed var(--border-color); border-radius: var(--radius); padding: 45px 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
-
-    /* TERMINAL CART PANEL */
-    .cart-panel {
-      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-md);
-      padding: 20px; position: sticky; top: 96px;
-    }
-    .cart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
-    .cart-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; margin: 0; font-weight: 700; color: var(--brand-dark); }
-    .cart-count { min-width: 26px; height: 26px; border-radius: 50%; background: var(--brand-main); color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
-    
-    .cart-list { min-height: 120px; max-height: 270px; overflow-y: auto; padding-right: 4px; }
-    .cart-list::-webkit-scrollbar { width: 4px; }
-    .cart-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .empty-cart { text-align: center; padding: 40px 10px; color: #94a3b8; font-size: 12px; }
-    
-    .cart-item { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border-color); }
-    .cart-item:last-child { border-bottom: 0; }
-    .cart-item-name { font-size: 12px; font-weight: 700; margin-bottom: 2px; color: var(--text-main); }
-    .cart-item-meta { font-size: 11px; color: var(--text-muted); }
-    .cart-item-right { text-align: right; }
-    .cart-item-price { font-size: 12px; font-weight: 800; color: var(--text-main); }
-    .remove-btn { border: 0; background: none; color: #ef4444; font-size: 10px; padding: 2px 0; font-weight: 600; }
-    .remove-btn:hover { text-decoration: underline; }
-
-    .summary { padding-top: 14px; border-top: 1px solid var(--border-color); }
-    .summary-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
-    .summary-row strong { color: var(--text-main); }
-    .summary-total { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px dashed var(--border-color); padding-top: 12px; margin-top: 8px; margin-bottom: 12px; }
-    .summary-total span { font-size: 12px; color: var(--text-muted); font-weight: 700; }
-    .summary-total strong { font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: var(--brand-main); font-weight: 700; line-height: 1; }
-
-    .change-row { display: flex; justify-content: space-between; align-items: center; background: var(--brand-soft); padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; color: var(--brand-dark); font-weight: 600; }
-    .change-row strong { font-size: 14px; font-weight: 800; color: var(--brand-main); }
-
-    .payment-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); font-weight: 800; margin-bottom: 8px; }
-    .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-    .payment-option { position: relative; }
-    .payment-option input { position: absolute; opacity: 0; }
-    .payment-option label {
-      display: flex; align-items: center; justify-content: center; padding: 9px; border: 1.5px solid var(--border-color);
-      border-radius: 10px; font-size: 11px; font-weight: 700; color: var(--text-muted); background: #fff; cursor: pointer; transition: all 0.2s;
-    }
-    .payment-option input:checked + label { border-color: var(--brand-main); background: var(--brand-soft); color: var(--brand-main); }
-    
-    .cash-wrap { margin-bottom: 12px; }
-    .cash-wrap input { height: 42px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 12px; font-weight: 600; padding: 0 12px; outline: none; width: 100%; transition: all 0.2s; }
-    .cash-wrap input:focus { border-color: var(--brand-main); box-shadow: 0 0 0 3px rgba(12, 59, 46, 0.08); }
-    
-    .pay-btn {
-      width: 100%; height: 48px; border: 0; border-radius: 10px; background: var(--brand-main); color: #fff;
-      font-size: 12px; font-weight: 800; box-shadow: 0 8px 16px rgba(12, 59, 46, 0.2); transition: all 0.2s; letter-spacing: 0.5px;
-    }
-    .pay-btn:hover { background: var(--brand-dark); transform: translateY(-1px); }
-    .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-    /* IMAGE UPLOAD & PREVIEW STYLES */
-    .image-upload-wrapper {
-      border: 2px dashed var(--border-color); border-radius: 10px; padding: 14px;
-      text-align: center; background: #fafafa; transition: all 0.2s ease; cursor: pointer;
-    }
-    .image-upload-wrapper:hover { border-color: var(--brand-accent); background: var(--brand-soft); }
-    .image-preview-container { margin-top: 10px; position: relative; display: inline-block; width: 100%; }
-    .image-preview-container img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); }
-    .btn-remove-preview {
-      position: absolute; top: 6px; right: 6px; background: rgba(239, 68, 68, 0.9);
-      color: #fff; border: 0; width: 24px; height: 24px; border-radius: 50%;
-      font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold;
-    }
-
-    /* TOAST */
-    .toast-message {
-      position: fixed; right: 28px; bottom: 28px; z-index: 3000; background: var(--brand-dark); color: #fff;
-      padding: 12px 18px; border-radius: 10px; font-size: 12px; font-weight: 600; box-shadow: var(--shadow-lg);
-      opacity: 0; transform: translateY(12px); pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .toast-message.show { opacity: 1; transform: translateY(0); }
-
-    /* NOTA PEMBELIAN */
-    .receipt-modal-body { background: #f1f5f9; padding: 20px; display: flex; justify-content: center; }
-    .receipt-paper {
-      background: #fff; width: 100%; max-width: 300px; padding: 20px 16px; border-radius: 6px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06); font-family: 'Courier New', Courier, monospace; font-size: 11px; color: #000;
-    }
-    .receipt-header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
-    .receipt-header h3 { font-size: 15px; font-weight: bold; margin: 0 0 4px; text-transform: uppercase; }
-    .receipt-header p { margin: 2px 0; font-size: 10px; color: #333; }
-    .receipt-info { border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 10px; font-size: 10px; }
-    .receipt-info div { display: flex; justify-content: space-between; margin-bottom: 2px; }
-    .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 8px; }
-    .receipt-table td { padding: 3px 0; vertical-align: top; }
-    .receipt-totals { margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 8px; }
-    .receipt-totals div { display: flex; justify-content: space-between; margin-bottom: 2px; font-size: 10px; }
-    .receipt-footer { text-align: center; font-size: 9px; margin-top: 12px; }
-
-    footer { font-size: 11px; color: var(--text-muted); text-align: center; padding: 16px 20px 20px; font-weight: 500; }
-
-    /* CETAK NOTA THERMAL PRINT */
-    @media print {
-      body * { visibility: hidden; }
-      #printable-receipt, #printable-receipt * { visibility: visible; }
-      #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; max-width: 80mm; padding: 0; margin: 0; box-shadow: none; border-radius: 0; }
-      .modal-backdrop, .modal { display: none !important; }
-    }
-
-    @media(max-width: 1150px) {
-      .pos-layout { grid-template-columns: minmax(0, 1fr) 350px; }
-      .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media(max-width: 850px) {
-      .topbar { padding: 0 16px; }
-      .content { padding: 16px; }
-      .pos-layout { grid-template-columns: 1fr; }
-      .cart-panel { position: relative; top: 0; }
-    }
-    @media(max-width: 560px) {
-      .date-pill { display: none; }
-      .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-      .menu-photo { height: 110px; }
-      .menu-body { padding: 10px; }
-      .menu-name { font-size: 12px; }
-      .menu-price { font-size: 12px; }
-    }
+    /* Tombol */
+    .btn { width: 100%; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    .btn-primary { background: #28a745; color: white; margin-top: 10px; }
+    .btn-primary:disabled { background: #ccc; }
   </style>
 </head>
-
 <body>
-<div class="app-shell">
 
-  <!-- TOPBAR TERMINAL POS -->
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-icon">☕</div>
-      <div class="brand-text">
-        <strong>Three4Five</strong>
-        <span>POS Terminal</span>
-      </div>
-    </div>
-
-    <div class="cashier-info">
-      <div class="date-pill" id="current-date">--/--/----</div>
-      <div class="cashier-badge">
-        <div class="avatar">K</div>
-        <span>Kasir Utama</span>
-      </div>
-    </div>
-  </header>
-
-  <main class="content">
-    <section id="view-kasir">
-      <div class="pos-layout">
-
-        <!-- METODE UTAMA: KATALOG & GRID MENU -->
-        <div>
-          <div class="section-head">
-            <h2>Katalog Produk</h2>
-            <div class="head-actions">
-              <span class="badge-count" id="menu-count">0 produk</span>
-              <button class="btn-add-menu" type="button" onclick="openAddMenuModal()">
-                <span>+</span> Tambah Menu
-              </button>
-            </div>
-          </div>
-
-          <div class="category-bar" id="category-bar">
-            <button class="category-btn active" data-category="all" type="button">Semua Menu</button>
-            <button class="category-btn" data-category="ice-coffee" type="button">Ice Coffee</button>
-            <button class="category-btn" data-category="americano" type="button">Americano</button>
-            <button class="category-btn" data-category="non-coffee" type="button">Non Coffee</button>
-          </div>
-
-          <div class="menu-grid" id="menu-grid"></div>
-        </div>
-
-        <!-- TERMINAL KASIR / PANEL TRANSAKSI -->
-        <aside class="cart-panel">
-          <div class="cart-head">
-            <h2>Rincian Pesanan</h2>
-            <div class="cart-count" id="cart-count">0</div>
-          </div>
-
-          <div id="cart-list" class="cart-list">
-            <div class="empty-cart">
-              <div style="font-size:32px;margin-bottom:8px">🛍️</div>
-              Belum ada pesanan terpilih
-            </div>
-          </div>
-
-          <div class="summary">
-            <div class="summary-row">
-              <span>Subtotal</span>
-              <strong id="subtotal-text">Rp 0</strong>
-            </div>
-            <div class="summary-row">
-              <span>Pajak (0%)</span>
-              <strong>Rp 0</strong>
-            </div>
-
-            <div class="summary-total">
-              <span>Total Tagihan</span>
-              <strong id="total-text">Rp 0</strong>
-            </div>
-
-            <div class="change-row" id="change-row">
-              <span>Kembalian</span>
-              <strong id="change-text">Rp 0</strong>
-            </div>
-
-            <div class="payment-title">Metode Pembayaran</div>
-
-            <div class="payment-options">
-              <div class="payment-option">
-                <input type="radio" name="payment" id="pay-tunai" value="Tunai" checked>
-                <label for="pay-tunai">💵 Tunai</label>
-              </div>
-              <div class="payment-option">
-                <input type="radio" name="payment" id="pay-qris" value="QRIS">
-                <label for="pay-qris">▦ QRIS</label>
-              </div>
-            </div>
-
-            <div class="cash-wrap" id="cash-wrap">
-              <input id="cash-received" placeholder="Nominal Uang Diterima..." type="number" min="0">
-            </div>
-
-            <button id="btn-pay" class="pay-btn" type="button">Selesaikan Transaksi</button>
-          </div>
-        </aside>
-
-      </div>
-    </section>
-  </main>
-
-  <footer>&copy; Three4Five Coffee · Professional Point of Sale</footer>
-</div>
-
-<!-- TOAST NOTIFICATION -->
-<div class="toast-message" id="toast-message"></div>
-
-<!-- MODAL TAMBAH MENU BARU -->
-<div class="modal fade" id="addMenuModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius: 16px; border: 0; overflow: hidden;">
-      <div class="modal-header" style="background: var(--brand-dark); color: #fff; padding: 16px 20px;">
-        <h5 class="modal-title" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;">Tambah Menu Baru</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form id="form-add-menu">
-        <div class="modal-body" style="padding: 20px;">
-          <div class="mb-3">
-            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Nama Menu</label>
-            <input type="text" id="add-name" class="form-control" placeholder="Contoh: Caramel Latte" required style="border-radius: 8px; font-size: 13px;">
-          </div>
-          
-          <div class="row g-2 mb-3">
-            <div class="col-6">
-              <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Harga (Rp)</label>
-              <input type="number" id="add-price" class="form-control" placeholder="22000" required min="0" style="border-radius: 8px; font-size: 13px;">
-            </div>
-            <div class="col-6">
-              <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Stok Awalan</label>
-              <input type="number" id="add-stock" class="form-control" placeholder="50" required min="0" style="border-radius: 8px; font-size: 13px;">
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Kategori</label>
-            <select id="add-category" class="form-select" style="border-radius: 8px; font-size: 13px;">
-              <option value="ice-coffee">Ice Coffee</option>
-              <option value="americano">Americano</option>
-              <option value="non-coffee">Non Coffee</option>
-            </select>
-          </div>
-
-          <!-- FITUR UPLOAD GAMBAR BARU -->
-          <div class="mb-2">
-            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Upload Gambar Menu</label>
-            <div class="image-upload-wrapper" onclick="document.getElementById('add-image-file').click()">
-              <input type="file" id="add-image-file" accept="image/*" style="display: none;" onchange="handleImageUpload(this, 'add-preview-container', 'add-preview-img', 'add-image-base64')">
-              <input type="hidden" id="add-image-base64">
-              <div id="add-upload-placeholder">
-                <div style="font-size: 24px; margin-bottom: 4px;">📁</div>
-                <span style="font-size: 12px; font-weight: 600; color: var(--brand-main);">Klik untuk Pilih Gambar</span>
-                <p style="font-size: 10px; color: var(--text-muted); margin: 2px 0 0;">Format JPG, PNG, WEBP (Maks 2MB)</p>
-              </div>
-              <div id="add-preview-container" class="image-preview-container hidden">
-                <img id="add-preview-img" src="" alt="Preview">
-                <button type="button" class="btn-remove-preview" onclick="removeImageUpload(event, 'add-image-file', 'add-preview-container', 'add-upload-placeholder', 'add-image-base64')">×</button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid var(--border-color); padding: 12px 20px;">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600; font-size: 12px;">Batal</button>
-          <button type="submit" id="btn-save-add-menu" class="btn" style="background: var(--brand-main); color: #fff; border-radius: 8px; font-weight: 700; font-size: 12px;">+ Tambah Menu</button>
-        </div>
-      </form>
-    </div>
+  <!-- SEKSI DAFTAR MENU -->
+  <div class="section-menu">
+    <h2>Daftar Menu</h2>
+    <div id="loading-menu">Memuat data menu...</div>
+    <div id="menu-grid" class="menu-grid"></div>
   </div>
-</div>
 
-<!-- MODAL EDIT MENU -->
-<div class="modal fade" id="editMenuModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius: 16px; border: 0; overflow: hidden;">
-      <div class="modal-header" style="background: var(--brand-dark); color: #fff; padding: 16px 20px;">
-        <h5 class="modal-title" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;">Edit Data Menu</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+  <!-- SEKSI KERANJANG TRANSAKSI -->
+  <div class="section-cart">
+    <h2>Keranjang Transaksi</h2>
+    <form id="form-transaksi">
+      <ul id="cart-list" class="cart-list">
+        <li style="color: #888; text-align: center;">Belum ada pesanan</li>
+      </ul>
+      
+      <div class="total-box">
+        Total: Rp <span id="total-harga">0</span>
       </div>
-      <form id="form-edit-menu">
-        <div class="modal-body" style="padding: 20px;">
-          <input type="hidden" id="edit-id">
-          
-          <div class="mb-3">
-            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Nama Menu</label>
-            <input type="text" id="edit-name" class="form-control" required style="border-radius: 8px; font-size: 13px;">
-          </div>
-          
-          <div class="row g-2 mb-3">
-            <div class="col-6">
-              <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Harga (Rp)</label>
-              <input type="number" id="edit-price" class="form-control" required min="0" style="border-radius: 8px; font-size: 13px;">
-            </div>
-            <div class="col-6">
-              <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Stok</label>
-              <input type="number" id="edit-stock" class="form-control" required min="0" style="border-radius: 8px; font-size: 13px;">
-            </div>
-          </div>
 
-          <div class="mb-3">
-            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Kategori</label>
-            <select id="edit-category" class="form-select" style="border-radius: 8px; font-size: 13px;">
-              <option value="ice-coffee">Ice Coffee</option>
-              <option value="americano">Americano</option>
-              <option value="non-coffee">Non Coffee</option>
-            </select>
-          </div>
-
-          <!-- FITUR UPLOAD GAMBAR EDIT -->
-          <div class="mb-2">
-            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Upload Gambar Menu Baru (Opsional)</label>
-            <div class="image-upload-wrapper" onclick="document.getElementById('edit-image-file').click()">
-              <input type="file" id="edit-image-file" accept="image/*" style="display: none;" onchange="handleImageUpload(this, 'edit-preview-container', 'edit-preview-img', 'edit-image-base64')">
-              <input type="hidden" id="edit-image-base64">
-              <div id="edit-upload-placeholder" class="hidden">
-                <div style="font-size: 24px; margin-bottom: 4px;">📁</div>
-                <span style="font-size: 12px; font-weight: 600; color: var(--brand-main);">Klik untuk Ganti Gambar</span>
-              </div>
-              <div id="edit-preview-container" class="image-preview-container">
-                <img id="edit-preview-img" src="" alt="Preview">
-                <button type="button" class="btn-remove-preview" onclick="removeImageUpload(event, 'edit-image-file', 'edit-preview-container', 'edit-upload-placeholder', 'edit-image-base64')">×</button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid var(--border-color); padding: 12px 20px;">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600; font-size: 12px;">Batal</button>
-          <button type="submit" id="btn-save-menu" class="btn" style="background: var(--brand-main); color: #fff; border-radius: 8px; font-weight: 700; font-size: 12px;">Simpan Perubahan</button>
-        </div>
-      </form>
-    </div>
+      <button type="submit" id="btn-submit" class="btn btn-primary" disabled>Proses Transaksi</button>
+    </form>
   </div>
-</div>
 
-<!-- MODAL CETAK NOTA PEMBELIAN -->
-<div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: 0;">
-      <div class="modal-header" style="background: var(--brand-dark); color: #fff; border: 0; padding: 16px 20px;">
-        <h5 class="modal-title" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px;">Transaksi Sukses</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="receipt-modal-body">
-        
-        <div class="receipt-paper" id="printable-receipt">
-          <div class="receipt-header">
-            <h3>Three4Five Coffee</h3>
-            <p>Jl. Raya Utama No. 345</p>
-            <p>Telp: 0812-3456-7890</p>
-          </div>
-          <div class="receipt-info">
-            <div><span>No. Nota:</span><strong id="rec-id">#TRX-000</strong></div>
-            <div><span>Tgl:</span><span id="rec-date">18/08/2026 12:00</span></div>
-            <div><span>Metode:</span><span id="rec-method">Tunai</span></div>
-          </div>
-          <table class="receipt-table">
-            <tbody id="rec-items"></tbody>
-          </table>
-          <div class="receipt-totals">
-            <div><span>Total:</span><strong id="rec-total">Rp 0</strong></div>
-            <div><span>Bayar:</span><span id="rec-cash">Rp 0</span></div>
-            <div><span>Kembali:</span><span id="rec-change">Rp 0</span></div>
-          </div>
-          <div class="receipt-footer">
-            <p>*** TERIMA KASIH ***</p>
-            <p>Selamat Menikmati Kopi Anda</p>
-          </div>
-        </div>
+  <script>
+    // Ganti dengan URL Web App Google Apps Script Anda
+    const URL_APPS_SCRIPT = "GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA";
 
-      </div>
-      <div class="modal-footer" style="background: #fff; border-top: 1px solid var(--border-color); padding: 12px 20px;">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600; font-size: 12px;">Tutup</button>
-        <button type="button" class="btn" onclick="window.print()" style="background: var(--brand-main); color: #fff; border-radius: 8px; font-weight: 700; font-size: 12px;">🖨️ Cetak Nota</button>
-      </div>
-    </div>
-  </div>
-</div>
+    // PISAHKAN STATE: Master Menu & Data Keranjang
+    let masterDataMenu = []; 
+    let keranjangData = [];
 
-<!-- Configuration Scripts -->
-<script>
-  window.__three4five_config = {
-    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyep_2ZvPePJfNLAhsFteZnjRmxZ0cGPhzrorCUibVrKasE87gI5U9Ube6JSbXsBQdJ4g/exec',
-    forceSyncOnLoad: true
-  };
-</script>
-
-<script src="data/sheets-helper.js"
-        data-app-script-url="https://script.google.com/macros/s/AKfycbyep_2ZvPePJfNLAhsFteZnjRmxZ0cGPhzrorCUibVrKasE87gI5U9Ube6JSbXsBQdJ4g/exec"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-  /* =========================================================
-     APP STATE & UTILITY FUNCTIONS
-     ========================================================= */
-  let menuList = [];
-  let cart = [];
-  let activeCategory = 'all';
-  let receiptModalInstance = null;
-  let editMenuModalInstance = null;
-  let addMenuModalInstance = null;
-
-  function formatRupiah(n){
-    return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID');
-  }
-
-  function escapeHtml(value){
-    return String(value ?? '')
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;')
-      .replace(/'/g,'&#039;');
-  }
-
-  /* UTILITY: HANDLING UPLOAD & COMPRESS FILE GAMBAR DENGAN BASE64 */
-  function handleImageUpload(inputEl, containerId, previewImgId, hiddenBase64Id) {
-    const file = inputEl.files[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      showToast('Ukuran file terlalu besar (Maks 5MB)');
-      inputEl.value = '';
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        // Compress Canvas
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 600;
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = (img.width > MAX_WIDTH) ? MAX_WIDTH : img.width;
-        canvas.height = (img.width > MAX_WIDTH) ? img.height * scaleSize : img.height;
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-
-        document.getElementById(hiddenBase64Id).value = resizedBase64;
-        document.getElementById(previewImgId).src = resizedBase64;
-
-        const container = document.getElementById(containerId);
-        container.classList.remove('hidden');
-
-        // Sembunyikan placeholder upload jika ada
-        const placeholderId = containerId.replace('-preview-container', '-upload-placeholder');
-        const placeholder = document.getElementById(placeholderId);
-        if(placeholder) placeholder.classList.add('hidden');
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function removeImageUpload(event, fileInputId, containerId, placeholderId, hiddenBase64Id) {
-    event.stopPropagation();
-    document.getElementById(fileInputId).value = '';
-    document.getElementById(hiddenBase64Id).value = '';
-    document.getElementById(containerId).classList.add('hidden');
-    
-    const placeholder = document.getElementById(placeholderId);
-    if(placeholder) placeholder.classList.remove('hidden');
-  }
-
-  function categoryName(category){
-    const c = String(category || '').toLowerCase();
-    if(c === 'ice-coffee') return 'Ice Coffee';
-    if(c === 'americano') return 'Americano';
-    if(c === 'non-coffee') return 'Non Coffee';
-    return category || 'Menu';
-  }
-
-  function showToast(message){
-    const toast = document.getElementById('toast-message');
-    toast.textContent = message;
-    toast.classList.add('show');
-    clearTimeout(window.__toastTimer);
-    window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
-  }
-
-  function updateDate(){
-    const el = document.getElementById('current-date');
-    const now = new Date();
-    el.textContent = now.toLocaleDateString('id-ID',{
-      weekday:'short',
-      day:'2-digit',
-      month:'short',
-      year:'numeric'
+    // 1. MUAT DATA MENU SAAT HALAMAN PERTAMA KALI DIBUKA
+    document.addEventListener("DOMContentLoaded", function() {
+      fetchMenuData();
     });
-  }
 
-  /* =========================================================
-     SYNC / LOAD DATA SHEETS
-     ========================================================= */
-  async function loadDataFromSheets(){
-    try{
-      menuList = await window.__three4five_sheets.getMenu();
-      if(!Array.isArray(menuList)) menuList = [];
-      renderMenu();
-    }catch(e){
-      console.error('[App] loadData error', e);
-      showToast('Gagal memuat data dari Sheets');
-    }
-  }
-
-  /* =========================================================
-     RENDER MENU GRID
-     ========================================================= */
-  function renderMenu(){
-    const grid = document.getElementById('menu-grid');
-    grid.innerHTML = '';
-
-    const filtered = activeCategory === 'all'
-      ? menuList
-      : menuList.filter(item => String(item.category || '').toLowerCase() === activeCategory);
-
-    document.getElementById('menu-count').textContent = `${filtered.length} produk`;
-
-    if(!filtered.length){
-      grid.innerHTML = `
-        <div class="empty-menu">
-          <div style="font-size:32px;margin-bottom:8px">☕</div>
-          Tidak ada menu pada kategori ini.
-        </div>`;
-      return;
+    function fetchMenuData() {
+      fetch(URL_APPS_SCRIPT)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("loading-menu").style.display = "none";
+          masterDataMenu = data; // Simpan ke Master Data (Permanen di memory JS)
+          renderMenuGrid(masterDataMenu);
+        })
+        .catch(err => {
+          document.getElementById("loading-menu").innerText = "Gagal memuat menu!";
+          console.error("Error fetching menu:", err);
+        });
     }
 
-    filtered.forEach(item => {
-      const col = document.createElement('div');
-      col.className = 'col-md-4';
+    // 2. RENDER MASTER MENU KE TAMPILAN (Tidak terpengaruh transaksi)
+    function renderMenuGrid(items) {
+      const menuContainer = document.getElementById("menu-grid");
+      menuContainer.innerHTML = ""; 
 
-      const stock = Number(item.stock) || 0;
-      const image = item.image || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
-
-      col.innerHTML = `
-        <div class="menu-card">
-          <button class="edit-menu-btn" type="button" title="Edit Menu" onclick="openEditMenuModal('${String(item.id).replace(/'/g,"\\'")}')">
-            ✏️
-          </button>
-
-          <div class="menu-photo">
-            <img src="${escapeHtml(image)}" alt="${escapeHtml(item.name || 'Menu')}" onerror="this.onerror=null;this.src='https://via.placeholder.com/600x400?text=Kopi+Image';">
-            <span class="stock-badge">Stok ${stock}</span>
-          </div>
-
-          <div class="menu-body">
-            <div class="menu-category">${escapeHtml(categoryName(item.category))}</div>
-            <div class="menu-name">${escapeHtml(item.name || '')}</div>
-
-            <div class="menu-footer">
-              <div class="menu-price">${formatRupiah(Number(item.price)||0)}</div>
-              <button class="add-btn" type="button" onclick="addToCart('${String(item.id).replace(/'/g,"\\'")}')">
-                + Tambah
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      grid.appendChild(col);
-    });
-  }
-
-  /* CATEGORY FILTER LISTENERS */
-  document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.addEventListener('click', function(){
-      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      activeCategory = this.dataset.category || 'all';
-      renderMenu();
-    });
-  });
-
-  /* =========================================================
-     MODAL & PROSES TAMBAH MENU BARU
-     ========================================================= */
-  function openAddMenuModal(){
-    document.getElementById('form-add-menu').reset();
-    document.getElementById('add-image-base64').value = '';
-    document.getElementById('add-preview-container').classList.add('hidden');
-    document.getElementById('add-upload-placeholder').classList.remove('hidden');
-    addMenuModalInstance.show();
-  }
-
-  document.getElementById('form-add-menu').addEventListener('submit', async function(e){
-    e.preventDefault();
-
-    const imageBase64 = document.getElementById('add-image-base64').value;
-    const finalImage = imageBase64 || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
-
-    const newMenuData = {
-      id: 'MNU-' + Date.now().toString().slice(-6),
-      name: document.getElementById('add-name').value.trim(),
-      price: Number(document.getElementById('add-price').value) || 0,
-      stock: Number(document.getElementById('add-stock').value) || 0,
-      category: document.getElementById('add-category').value,
-      image: finalImage
-    };
-
-    const submitBtn = document.getElementById('btn-save-add-menu');
-    const originalText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Menyimpan...';
-
-    try {
-      let ok = false;
-      if (window.__three4five_sheets && typeof window.__three4five_sheets.addMenu === 'function') {
-        const res = await window.__three4five_sheets.addMenu(newMenuData);
-        ok = res && res.ok;
-      } else if (window.__three4five_sheets && typeof window.__three4five_sheets.saveMenu === 'function') {
-        const res = await window.__three4five_sheets.saveMenu(newMenuData);
-        ok = res && res.ok;
-      } else {
-        // Fallback simpan lokal
-        menuList.push(newMenuData);
-        ok = true;
+      if (!items || items.length === 0) {
+        menuContainer.innerHTML = "<p>Data menu kosong.</p>";
+        return;
       }
 
-      if (ok) {
-        showToast('✓ Menu baru berhasil ditambahkan');
-        addMenuModalInstance.hide();
-        await loadDataFromSheets();
-      } else {
-        showToast('Gagal menambahkan menu baru');
-      }
-    } catch(err) {
-      console.error(err);
-      showToast('Terjadi kesalahan saat menyimpan menu');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
-    }
-  });
+      items.forEach(item => {
+        // Penanganan properti harga/nama yang toleran
+        const nama = item.Nama || item.nama || item.Item || item[0] || "Menu";
+        const harga = item.Harga || item.harga || item[1] || 0;
 
-  /* =========================================================
-     MODAL & PROSES EDIT MENU
-     ========================================================= */
-  function openEditMenuModal(id){
-    const item = menuList.find(m => String(m.id) === String(id));
-    if(!item) return;
-
-    document.getElementById('edit-id').value = item.id;
-    document.getElementById('edit-name').value = item.name || '';
-    document.getElementById('edit-price').value = Number(item.price) || 0;
-    document.getElementById('edit-stock').value = Number(item.stock) || 0;
-    document.getElementById('edit-category').value = String(item.category || 'ice-coffee').toLowerCase();
-    
-    // Set preview gambar eksis
-    const currentImg = item.image || '';
-    document.getElementById('edit-image-base64').value = currentImg;
-    
-    if (currentImg) {
-      document.getElementById('edit-preview-img').src = currentImg;
-      document.getElementById('edit-preview-container').classList.remove('hidden');
-      document.getElementById('edit-upload-placeholder').classList.add('hidden');
-    } else {
-      document.getElementById('edit-preview-container').classList.add('hidden');
-      document.getElementById('edit-upload-placeholder').classList.remove('hidden');
-    }
-
-    editMenuModalInstance.show();
-  }
-
-  document.getElementById('form-edit-menu').addEventListener('submit', async function(e){
-    e.preventDefault();
-
-    const id = document.getElementById('edit-id').value;
-    const finalImage = document.getElementById('edit-image-base64').value || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
-
-    const updatedData = {
-      id: id,
-      name: document.getElementById('edit-name').value.trim(),
-      price: Number(document.getElementById('edit-price').value) || 0,
-      stock: Number(document.getElementById('edit-stock').value) || 0,
-      category: document.getElementById('edit-category').value,
-      image: finalImage
-    };
-
-    const submitBtn = document.getElementById('btn-save-menu');
-    const originalText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Menyimpan...';
-
-    try {
-      let ok = false;
-      if (window.__three4five_sheets && typeof window.__three4five_sheets.saveMenu === 'function') {
-        const res = await window.__three4five_sheets.saveMenu(updatedData);
-        ok = res && res.ok;
-      } else {
-        // Fallback update lokal
-        const index = menuList.findIndex(m => String(m.id) === String(id));
-        if (index !== -1) {
-          menuList[index] = { ...menuList[index], ...updatedData };
-          ok = true;
-        }
-      }
-
-      if (ok) {
-        showToast('✓ Menu berhasil diperbarui');
-        editMenuModalInstance.hide();
-        await loadDataFromSheets();
-      } else {
-        showToast('Gagal memperbarui menu');
-      }
-    } catch(err) {
-      console.error(err);
-      showToast('Terjadi kesalahan saat menyimpan');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
-    }
-  });
-
-  /* =========================================================
-     MANAJEMEN KERANJANG (CART)
-     ========================================================= */
-  function addToCart(id){
-    const item = menuList.find(m => String(m.id) === String(id));
-    if(!item) return;
-
-    const ex = cart.find(c => String(c.id) === String(id));
-
-    if(ex){
-      ex.qty++;
-    }else{
-      cart.push({
-        id: item.id,
-        name: item.name,
-        price: Number(item.price) || 0,
-        qty: 1
+        const card = document.createElement("div");
+        card.className = "menu-card";
+        card.innerHTML = `
+          <h4>${nama}</h4>
+          <p>Rp ${Number(harga).toLocaleString("id-ID")}</p>
+        `;
+        card.onclick = () => tambahKeKeranjang(nama, Number(harga));
+        menuContainer.appendChild(card);
       });
     }
 
-    renderCart();
-    showToast(`${item.name} ditambahkan`);
-  }
-
-  function removeCart(idx){
-    cart.splice(idx, 1);
-    renderCart();
-  }
-
-  function renderCart(){
-    const el = document.getElementById('cart-list');
-    const count = cart.reduce((sum, item) => sum + item.qty, 0);
-
-    document.getElementById('cart-count').textContent = count;
-
-    if(!cart.length){
-      el.innerHTML = `
-        <div class="empty-cart">
-          <div style="font-size:32px;margin-bottom:8px">🛍️</div>
-          Belum ada pesanan terpilih
-        </div>`;
-
-      document.getElementById('subtotal-text').innerText = formatRupiah(0);
-      document.getElementById('total-text').innerText = formatRupiah(0);
-      document.getElementById('change-text').innerText = formatRupiah(0);
-      document.getElementById('btn-pay').disabled = true;
-      return;
-    }
-
-    document.getElementById('btn-pay').disabled = false;
-
-    let subtotal = 0;
-    el.innerHTML = '';
-
-    cart.forEach((c, idx) => {
-      const itemTotal = c.price * c.qty;
-      subtotal += itemTotal;
-
-      const row = document.createElement('div');
-      row.className = 'cart-item';
-
-      row.innerHTML = `
-        <div>
-          <div class="cart-item-name">${escapeHtml(c.name)}</div>
-          <div class="cart-item-meta">${c.qty} × ${formatRupiah(c.price)}</div>
-        </div>
-        <div class="cart-item-right">
-          <div class="cart-item-price">${formatRupiah(itemTotal)}</div>
-          <button class="remove-btn" type="button" onclick="removeCart(${idx})">hapus</button>
-        </div>
-      `;
-
-      el.appendChild(row);
-    });
-
-    document.getElementById('subtotal-text').innerText = formatRupiah(subtotal);
-    document.getElementById('total-text').innerText = formatRupiah(subtotal);
-    
-    calculateChange();
-  }
-
-  /* =========================================================
-     METODE PEMBAYARAN & HITUNG KEMBALIAN
-     ========================================================= */
-  function getPaymentMethod(){
-    const checked = document.querySelector('input[name="payment"]:checked');
-    return checked ? checked.value : 'Tunai';
-  }
-
-  function calculateChange(){
-    const method = getPaymentMethod();
-    const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-    const cashInput = document.getElementById('cash-received');
-    const changeText = document.getElementById('change-text');
-
-    if(method !== 'Tunai'){
-      changeText.innerText = formatRupiah(0);
-      return;
-    }
-
-    const cash = Number(cashInput.value) || 0;
-    const change = cash >= total ? cash - total : 0;
-    changeText.innerText = formatRupiah(change);
-  }
-
-  document.querySelectorAll('input[name="payment"]').forEach(input => {
-    input.addEventListener('change', function(){
-      const method = getPaymentMethod();
-      const cashWrap = document.getElementById('cash-wrap');
-      const changeRow = document.getElementById('change-row');
-      
-      cashWrap.classList.toggle('hidden', method !== 'Tunai');
-      changeRow.classList.toggle('hidden', method !== 'Tunai');
-      
-      if(method !== 'Tunai'){
-        document.getElementById('cash-received').value = '';
-      }
-      calculateChange();
-    });
-  });
-
-  document.getElementById('cash-received').addEventListener('input', calculateChange);
-
-  /* =========================================================
-     PROSES PEMBAYARAN & STRUK
-     ========================================================= */
-  document.getElementById('btn-pay').addEventListener('click', async function(){
-    if(cart.length === 0){
-      showToast('Keranjang masih kosong');
-      return;
-    }
-
-    const method = getPaymentMethod();
-    const cash = Number(document.getElementById('cash-received').value) || 0;
-    const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-
-    if(method === 'Tunai' && cash < total){
-      showToast('Uang tunai kurang');
-      return;
-    }
-
-    const now = new Date();
-    const trxId = 'T345-' + Math.floor(1000 + Math.random() * 9000);
-    const change = method === 'Tunai' ? cash - total : 0;
-
-    const trx = {
-      id: trxId,
-      date: now.toISOString(),
-      items: [...cart],
-      method: method,
-      total: total,
-      cashReceived: method === 'Tunai' ? cash : total,
-      change: change,
-      timestamp: Date.now()
-    };
-
-    const btn = this;
-    const originalText = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = 'Menyimpan...';
-
-    try {
-      const r = await window.__three4five_sheets.addTransaction(trx);
-
-      if(r && r.ok){
-        showToast('✓ Transaksi berhasil');
-        
-        populateReceipt(trx, now);
-        receiptModalInstance.show();
-
-        cart = [];
-        document.getElementById('cash-received').value = '';
-        renderCart();
-        loadDataFromSheets();
+    // 3. TAMBAH ITEM KE KERANJANG
+    function tambahKeKeranjang(nama, harga) {
+      const idx = keranjangData.findIndex(i => i.nama === nama);
+      if (idx > -1) {
+        keranjangData[idx].qty += 1;
+        keranjangData[idx].subtotal = keranjangData[idx].qty * harga;
       } else {
-        showToast('Gagal menyimpan transaksi');
+        keranjangData.push({ nama, harga, qty: 1, subtotal: harga });
       }
-    } catch(e) {
-      console.error(e);
-      showToast('Error saat menyimpan transaksi');
-    } finally {
-      btn.textContent = originalText;
-      if(cart.length) btn.disabled = false;
+      updateCartView();
     }
-  });
 
-  function populateReceipt(trx, dateObj){
-    document.getElementById('rec-id').innerText = '#' + trx.id;
-    document.getElementById('rec-date').innerText = dateObj.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
-    document.getElementById('rec-method').innerText = trx.method;
-    
-    const tbody = document.getElementById('rec-items');
-    tbody.innerHTML = '';
-    
-    trx.items.forEach(item => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td style="width:55%">${escapeHtml(item.name)}<br><small>${item.qty} x ${formatRupiah(item.price)}</small></td>
-        <td style="width:45%; text-align:right;">${formatRupiah(item.qty * item.price)}</td>
-      `;
-      tbody.appendChild(row);
+    // 4. UPDATE TAMPILAN KERANJANG & TOTAL
+    function updateCartView() {
+      const cartContainer = document.getElementById("cart-list");
+      const btnSubmit = document.getElementById("btn-submit");
+      cartContainer.innerHTML = "";
+
+      if (keranjangData.length === 0) {
+        cartContainer.innerHTML = `<li style="color: #888; text-align: center;">Belum ada pesanan</li>`;
+        document.getElementById("total-harga").innerText = "0";
+        btnSubmit.disabled = true;
+        return;
+      }
+
+      let grandTotal = 0;
+      keranjangData.forEach(item => {
+        grandTotal += item.subtotal;
+        const li = document.createElement("li");
+        li.className = "cart-item";
+        li.innerHTML = `
+          <span>${item.nama} x${item.qty}</span>
+          <span>Rp ${item.subtotal.toLocaleString("id-ID")}</span>
+        `;
+        cartContainer.appendChild(li);
+      });
+
+      document.getElementById("total-harga").innerText = grandTotal.toLocaleString("id-ID");
+      btnSubmit.disabled = false;
+    }
+
+    // 5. PROSES SUBMIT TRANSAKSI (AMNAN TANPA MENGHAPUS MENU)
+    document.getElementById("form-transaksi").addEventListener("submit", function(e) {
+      e.preventDefault(); // SANGAT PENTING: Mencegah reload/submit default browser
+
+      const btnSubmit = document.getElementById("btn-submit");
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = "Menyimpan...";
+
+      // Format data pesanan sesuai kebutuhan Apps Script Anda
+      const detailPesanan = keranjangData.map(i => `${i.nama} (${i.qty})`).join(", ");
+      const totalBayar = keranjangData.reduce((acc, i) => acc + i.subtotal, 0);
+
+      const formData = new URLSearchParams();
+      formData.append("action", "transaksi");
+      formData.append("items", detailPesanan);
+      formData.append("total", totalBayar);
+
+      fetch(URL_APPS_SCRIPT, {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(res => {
+        alert("Transaksi Berhasil Disimpan!");
+        resetKeranjangOnly(); // Hanya hapus keranjang, Master Menu TIDAK disentuh
+      })
+      .catch(err => {
+        alert("Gagal menyimpan transaksi, periksa koneksi.");
+        console.error("Error post:", err);
+      })
+      .finally(() => {
+        btnSubmit.innerText = "Proses Transaksi";
+      });
     });
 
-    document.getElementById('rec-total').innerText = formatRupiah(trx.total);
-    document.getElementById('rec-cash').innerText = formatRupiah(trx.cashReceived);
-    document.getElementById('rec-change').innerText = formatRupiah(trx.change);
-  }
-
-  /* =========================================================
-     INITIALIZATION
-     ========================================================= */
-  document.addEventListener('DOMContentLoaded', async function() {
-    updateDate();
-    renderCart();
-    
-    receiptModalInstance = new bootstrap.Modal(document.getElementById('receiptModal'));
-    editMenuModalInstance = new bootstrap.Modal(document.getElementById('editMenuModal'));
-    addMenuModalInstance = new bootstrap.Modal(document.getElementById('addMenuModal'));
-    
-    if (window.__three4five_config && window.__three4five_config.forceSyncOnLoad) {
-      await loadDataFromSheets();
+    // 6. KHUSUS UNTUK MENGOSONGKAN KERANJANG SAJA
+    function resetKeranjangOnly() {
+      keranjangData = []; // Kosongkan array keranjang saja
+      updateCartView();   // Render ulang elemen keranjang
+      // Catatan: masterDataMenu & elemen #menu-grid TIDAK ikut dikosongkan/disentuh
     }
-  });
-</script>
+  </script>
 </body>
 </html>
