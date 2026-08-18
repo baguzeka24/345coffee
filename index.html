@@ -3,209 +3,216 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three4Five Coffee — POS</title>
+  <title>Three4Five Coffee — Pro Terminal POS</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
     :root {
-      --green-dark: #08291e;
-      --green-main: #0e4d37;
-      --green-light: #166c4e;
-      --green-soft: #eaf4f0;
-      --green-accent: #10b981;
-      --cream-bg: #f8f9fa;
+      --brand-dark: #061e16;
+      --brand-main: #0c3b2e;
+      --brand-surface: #124e3d;
+      --brand-accent: #10b981;
+      --brand-soft: #e8f5f1;
+      --bg-main: #f3f5f6;
       --card-bg: #ffffff;
-      --text-main: #111827;
-      --text-muted: #6b7280;
-      --border-color: #e5e7eb;
-      --shadow-sm: 0 2px 8px rgba(14, 77, 55, 0.04);
-      --shadow-md: 0 10px 25px -5px rgba(14, 77, 55, 0.08);
-      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
-      --radius: 16px;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 10px 25px -5px rgba(12, 59, 46, 0.08);
+      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+      --radius: 14px;
     }
 
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; font-family: 'Plus Jakarta Sans', sans-serif; background: #f3f5f4; color: var(--text-main); }
+    html, body { margin: 0; min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: var(--text-main); }
     button, input, select { font-family: inherit; }
     button { cursor: pointer; }
     .hidden { display: none !important; }
 
-    /* LAYOUT & SIDEBAR */
-    .app-shell { min-height: 100vh; display: flex; }
+    /* LAYOUT & HEADER */
+    .app-shell { min-height: 100vh; display: flex; flex-direction: column; }
 
-    .sidebar {
-      width: 250px; min-height: 100vh; background: var(--green-dark); color: #fff;
-      padding: 28px 18px; position: fixed; left: 0; top: 0; bottom: 0; z-index: 1050;
-      display: flex; flex-direction: column; border-right: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 32px; }
-    .brand-icon {
-      width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #22c55e, #0e4d37);
-      color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px;
-      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
-    }
-    .brand-text strong { font-family: 'Space Grotesk', sans-serif; font-size: 18px; display: block; letter-spacing: -0.3px; color: #fff; }
-    .brand-text span { font-size: 10px; color: var(--green-accent); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
-
-    .nav-label { font-size: 10px; color: #5a7d71; text-transform: uppercase; letter-spacing: 1.5px; padding: 0 12px 12px; font-weight: 700; }
-    .side-nav button {
-      width: 100%; border: 0; background: rgba(255,255,255,0.03); color: #a3b8b0; border-radius: 12px;
-      padding: 14px 16px; text-align: left; display: flex; align-items: center; gap: 12px;
-      font-size: 13px; font-weight: 600; transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.04);
-    }
-    .side-nav button:hover, .side-nav button.active { background: #fff; color: var(--green-dark); box-shadow: var(--shadow-md); font-weight: 700; border-color: #fff; }
-    .nav-icon { font-size: 16px; }
-
-    .sidebar-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; }
-    .cashier-profile { display: flex; align-items: center; gap: 12px; padding: 4px; }
-    .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--green-light); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; border: 2px solid rgba(255,255,255,0.2); }
-    .cashier-profile strong { display: block; font-size: 13px; color: #fff; }
-    .cashier-profile span { font-size: 11px; color: #7f9f93; }
-
-    /* MAIN & TOPBAR */
-    .main-area { margin-left: 250px; width: calc(100% - 250px); min-width: 0; }
     .topbar {
-      height: 80px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-color); display: flex; align-items: center;
-      justify-content: space-between; padding: 0 36px; position: sticky; top: 0; z-index: 900;
+      height: 72px; background: var(--brand-dark); color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center;
+      justify-content: space-between; padding: 0 32px; position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
-    .page-title h1 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; margin: 0; font-weight: 700; color: var(--green-dark); }
-    .page-title p { margin: 2px 0 0; color: var(--text-muted); font-size: 12px; }
-    .date-pill { background: #fff; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 30px; font-size: 12px; color: var(--text-main); font-weight: 600; box-shadow: var(--shadow-sm); }
-    .mobile-menu { display: none; border: 0; background: var(--green-main); color: #fff; border-radius: 10px; width: 42px; height: 42px; font-size: 18px; }
 
-    .content { padding: 32px 36px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #22c55e, #0c3b2e);
+      color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .brand-text strong { font-family: 'Space Grotesk', sans-serif; font-size: 18px; display: block; letter-spacing: -0.3px; color: #fff; line-height: 1.1; }
+    .brand-text span { font-size: 10px; color: var(--brand-accent); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
 
-    /* KASIR POS */
-    .pos-layout { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 28px; align-items: start; }
-    .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-    .section-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin: 0; font-weight: 700; color: var(--green-dark); }
-    .section-head span { font-size: 12px; color: var(--text-muted); background: #e5e7eb; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+    .cashier-info { display: flex; align-items: center; gap: 16px; }
+    .date-pill { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); padding: 7px 16px; border-radius: 30px; font-size: 12px; color: #cbd5e1; font-weight: 600; }
+    .cashier-badge { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 5px 12px 5px 6px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.08); }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; }
+    .cashier-badge span { font-size: 12px; font-weight: 600; color: #f1f5f9; }
 
-    .category-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
+    .content { padding: 24px 32px; flex: 1; }
+
+    /* KASIR POS GRID LAYOUT */
+    .pos-layout { display: grid; grid-template-columns: minmax(0, 1fr) 410px; gap: 24px; align-items: start; }
+    
+    .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .section-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin: 0; font-weight: 700; color: var(--brand-dark); }
+    .head-actions { display: flex; align-items: center; gap: 10px; }
+    .section-head span.badge-count { font-size: 12px; color: var(--text-muted); background: #e2e8f0; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+
+    .btn-add-menu {
+      background: var(--brand-accent); color: #fff; border: 0; padding: 6px 14px;
+      border-radius: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px;
+      transition: all 0.2s; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+    }
+    .btn-add-menu:hover { background: #059669; transform: translateY(-1px); }
+
+    .category-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
     .category-bar::-webkit-scrollbar { display: none; }
     .category-btn {
       border: 1px solid var(--border-color); background: #fff; color: var(--text-muted);
-      padding: 10px 20px; border-radius: 30px; font-size: 12px; font-weight: 600;
+      padding: 9px 18px; border-radius: 10px; font-size: 12px; font-weight: 700;
       white-space: nowrap; transition: all 0.2s; box-shadow: var(--shadow-sm);
     }
-    .category-btn:hover, .category-btn.active { background: var(--green-main); border-color: var(--green-main); color: #fff; box-shadow: 0 4px 12px rgba(14, 77, 55, 0.2); }
+    .category-btn:hover, .category-btn.active { background: var(--brand-main); border-color: var(--brand-main); color: #fff; box-shadow: 0 4px 12px rgba(12, 59, 46, 0.2); }
 
-    .menu-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    /* MENU GRID */
+    .menu-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
     .menu-grid > .col-md-4 { width: auto; padding: 0 !important; }
     .menu-card {
       background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden;
-      box-shadow: var(--shadow-sm); transition: all 0.25s ease; height: 100%; display: flex; flex-direction: column; position: relative;
+      box-shadow: var(--shadow-sm); transition: all 0.2s ease; height: 100%; display: flex; flex-direction: column; position: relative;
     }
-    .menu-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(14, 77, 55, 0.2); }
-    .menu-photo { height: 160px; position: relative; background: #f3f4f6; overflow: hidden; }
-    .menu-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
-    .menu-card:hover .menu-photo img { transform: scale(1.06); }
+    .menu-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(12, 59, 46, 0.2); }
+    .menu-photo { height: 140px; position: relative; background: #e2e8f0; overflow: hidden; }
+    .menu-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
+    .menu-card:hover .menu-photo img { transform: scale(1.05); }
+    
     .stock-badge {
-      position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
-      padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; color: var(--green-main); box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(4px);
+      padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; color: var(--brand-main); box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
-    .menu-body { padding: 16px; display: flex; flex-direction: column; flex: 1; }
-    .menu-category { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--green-accent); font-weight: 800; margin-bottom: 4px; }
-    .menu-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; color: var(--text-main); }
+    
+    /* EDIT BUTTON FLOATING ON CARD */
+    .edit-menu-btn {
+      position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px);
+      color: #fff; border: 0; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; transition: all 0.2s; z-index: 5;
+    }
+    .edit-menu-btn:hover { background: var(--brand-dark); transform: scale(1.1); }
+
+    .menu-body { padding: 14px; display: flex; flex-direction: column; flex: 1; }
+    .menu-category { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--brand-accent); font-weight: 800; margin-bottom: 3px; }
+    .menu-name { font-size: 13px; font-weight: 700; margin-bottom: 10px; line-height: 1.3; color: var(--text-main); }
     .menu-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 8px; }
-    .menu-price { font-size: 14px; font-weight: 800; color: var(--green-main); }
+    .menu-price { font-size: 14px; font-weight: 800; color: var(--brand-main); }
+    
     .add-btn {
-      border: 0; background: var(--green-soft); color: var(--green-main); border-radius: 10px; padding: 8px 14px;
+      border: 0; background: var(--brand-soft); color: var(--brand-main); border-radius: 8px; padding: 7px 12px;
       font-size: 11px; font-weight: 700; transition: all 0.2s;
     }
-    .add-btn:hover { background: var(--green-main); color: #fff; }
-    .empty-menu { grid-column: 1 / -1; background: #fff; border: 2px dashed var(--border-color); border-radius: var(--radius); padding: 50px 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
+    .add-btn:hover { background: var(--brand-main); color: #fff; }
+    .empty-menu { grid-column: 1 / -1; background: #fff; border: 2px dashed var(--border-color); border-radius: var(--radius); padding: 45px 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
 
-    /* CART PANEL */
+    /* TERMINAL CART PANEL */
     .cart-panel {
       background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-md);
-      padding: 24px; position: sticky; top: 104px;
+      padding: 20px; position: sticky; top: 96px;
     }
-    .cart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .cart-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; margin: 0; font-weight: 700; color: var(--green-dark); }
-    .cart-count { min-width: 28px; height: 28px; border-radius: 50%; background: var(--green-main); color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
-    .cart-list { min-height: 100px; max-height: 280px; overflow-y: auto; border-bottom: 1px border-style: dashed; border-color: var(--border-color); padding-bottom: 12px; }
+    .cart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+    .cart-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; margin: 0; font-weight: 700; color: var(--brand-dark); }
+    .cart-count { min-width: 26px; height: 26px; border-radius: 50%; background: var(--brand-main); color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    
+    .cart-list { min-height: 120px; max-height: 270px; overflow-y: auto; padding-right: 4px; }
     .cart-list::-webkit-scrollbar { width: 4px; }
-    .cart-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-    .empty-cart { text-align: center; padding: 40px 10px; color: #9ca3af; font-size: 12px; }
-    .cart-item { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+    .cart-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .empty-cart { text-align: center; padding: 40px 10px; color: #94a3b8; font-size: 12px; }
+    
+    .cart-item { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border-color); }
     .cart-item:last-child { border-bottom: 0; }
-    .cart-item-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; color: var(--text-main); }
+    .cart-item-name { font-size: 12px; font-weight: 700; margin-bottom: 2px; color: var(--text-main); }
     .cart-item-meta { font-size: 11px; color: var(--text-muted); }
     .cart-item-right { text-align: right; }
     .cart-item-price { font-size: 12px; font-weight: 800; color: var(--text-main); }
     .remove-btn { border: 0; background: none; color: #ef4444; font-size: 10px; padding: 2px 0; font-weight: 600; }
     .remove-btn:hover { text-decoration: underline; }
 
-    .summary { padding-top: 16px; }
-    .summary-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+    .summary { padding-top: 14px; border-top: 1px solid var(--border-color); }
+    .summary-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
     .summary-row strong { color: var(--text-main); }
-    .summary-total { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px dashed var(--border-color); padding-top: 16px; margin-top: 8px; margin-bottom: 16px; }
-    .summary-total span { font-size: 12px; color: var(--text-muted); font-weight: 600; }
-    .summary-total strong { font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: var(--green-main); font-weight: 700; line-height: 1; }
+    .summary-total { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px dashed var(--border-color); padding-top: 12px; margin-top: 8px; margin-bottom: 12px; }
+    .summary-total span { font-size: 12px; color: var(--text-muted); font-weight: 700; }
+    .summary-total strong { font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: var(--brand-main); font-weight: 700; line-height: 1; }
 
-    .change-row { display: flex; justify-content: space-between; align-items: center; background: var(--green-soft); padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 12px; color: var(--green-dark); font-weight: 600; }
-    .change-row strong { font-size: 15px; font-weight: 800; color: var(--green-main); }
+    .change-row { display: flex; justify-content: space-between; align-items: center; background: var(--brand-soft); padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; color: var(--brand-dark); font-weight: 600; }
+    .change-row strong { font-size: 14px; font-weight: 800; color: var(--brand-main); }
 
-    .payment-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; }
-    .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    .payment-option position: relative; }
+    .payment-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); font-weight: 800; margin-bottom: 8px; }
+    .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .payment-option { position: relative; }
     .payment-option input { position: absolute; opacity: 0; }
     .payment-option label {
-      display: flex; align-items: center; justify-content: center; padding: 10px; border: 1.5px solid var(--border-color);
-      border-radius: 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); background: #fff; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; padding: 9px; border: 1.5px solid var(--border-color);
+      border-radius: 10px; font-size: 11px; font-weight: 700; color: var(--text-muted); background: #fff; cursor: pointer; transition: all 0.2s;
     }
-    .payment-option input:checked + label { border-color: var(--green-main); background: var(--green-soft); color: var(--green-main); }
-    .cash-wrap { margin-bottom: 14px; }
-    .cash-wrap input { height: 44px; border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 12px; font-weight: 600; padding: 0 14px; outline: none; width: 100%; transition: all 0.2s; }
-    .cash-wrap input:focus { border-color: var(--green-main); box-shadow: 0 0 0 4px rgba(14, 77, 55, 0.08); }
+    .payment-option input:checked + label { border-color: var(--brand-main); background: var(--brand-soft); color: var(--brand-main); }
+    
+    .cash-wrap { margin-bottom: 12px; }
+    .cash-wrap input { height: 42px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 12px; font-weight: 600; padding: 0 12px; outline: none; width: 100%; transition: all 0.2s; }
+    .cash-wrap input:focus { border-color: var(--brand-main); box-shadow: 0 0 0 3px rgba(12, 59, 46, 0.08); }
     
     .pay-btn {
-      width: 100%; height: 50px; border: 0; border-radius: 12px; background: var(--green-main); color: #fff;
-      font-size: 12px; font-weight: 800; box-shadow: 0 10px 20px rgba(14, 77, 55, 0.2); transition: all 0.2s;
-      letter-spacing: 0.5px;
+      width: 100%; height: 48px; border: 0; border-radius: 10px; background: var(--brand-main); color: #fff;
+      font-size: 12px; font-weight: 800; box-shadow: 0 8px 16px rgba(12, 59, 46, 0.2); transition: all 0.2s; letter-spacing: 0.5px;
     }
-    .pay-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .pay-btn:hover { background: var(--brand-dark); transform: translateY(-1px); }
     .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* DRIVE HELPER INFO */
+    .drive-info-box {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 11px; color: var(--text-muted); margin-top: 6px;
+    }
+    .drive-info-box code { color: var(--brand-main); font-weight: 700; font-size: 11px; }
 
     /* TOAST */
     .toast-message {
-      position: fixed; right: 28px; bottom: 28px; z-index: 3000; background: var(--green-dark); color: #fff;
-      padding: 14px 20px; border-radius: 12px; font-size: 12px; font-weight: 600; box-shadow: var(--shadow-lg);
+      position: fixed; right: 28px; bottom: 28px; z-index: 3000; background: var(--brand-dark); color: #fff;
+      padding: 12px 18px; border-radius: 10px; font-size: 12px; font-weight: 600; box-shadow: var(--shadow-lg);
       opacity: 0; transform: translateY(12px); pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .toast-message.show { opacity: 1; transform: translateY(0); }
 
-    /* STRUK MODAL & NOTA (PRINT PREVIEW) */
-    .receipt-modal-body { background: #f3f4f6; padding: 24px; display: flex; justify-content: center; }
+    /* NOTA PEMBELIAN */
+    .receipt-modal-body { background: #f1f5f9; padding: 20px; display: flex; justify-content: center; }
     .receipt-paper {
-      background: #fff; width: 100%; max-width: 320px; padding: 24px 20px; border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08); font-family: 'Courier New', Courier, monospace; font-size: 12px; color: #000;
+      background: #fff; width: 100%; max-width: 300px; padding: 20px 16px; border-radius: 6px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06); font-family: 'Courier New', Courier, monospace; font-size: 11px; color: #000;
     }
-    .receipt-header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 12px; margin-bottom: 12px; }
-    .receipt-header h3 { font-size: 16px; font-weight: bold; margin: 0 0 4px; text-transform: uppercase; }
+    .receipt-header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+    .receipt-header h3 { font-size: 15px; font-weight: bold; margin: 0 0 4px; text-transform: uppercase; }
     .receipt-header p { margin: 2px 0; font-size: 10px; color: #333; }
-    .receipt-info { border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 12px; font-size: 11px; }
-    .receipt-info div { display: flex; justify-content: space-between; margin-bottom: 3px; }
-    .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; border-bottom: 1px dashed #000; padding-bottom: 8px; }
+    .receipt-info { border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 10px; font-size: 10px; }
+    .receipt-info div { display: flex; justify-content: space-between; margin-bottom: 2px; }
+    .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 8px; }
     .receipt-table td { padding: 3px 0; vertical-align: top; }
-    .receipt-totals { margin-bottom: 12px; border-bottom: 1px dashed #000; padding-bottom: 8px; }
-    .receipt-totals div { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px; }
-    .receipt-footer { text-align: center; font-size: 10px; margin-top: 14px; }
+    .receipt-totals { margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 8px; }
+    .receipt-totals div { display: flex; justify-content: space-between; margin-bottom: 2px; font-size: 10px; }
+    .receipt-footer { text-align: center; font-size: 9px; margin-top: 12px; }
 
-    footer { font-size: 11px; color: var(--text-muted); text-align: center; padding: 0 20px 24px; font-weight: 500; }
+    footer { font-size: 11px; color: var(--text-muted); text-align: center; padding: 16px 20px 20px; font-weight: 500; }
 
-    /* CSS CETAK PRINTER THERMAL (58mm/80mm) */
+    /* CETAK NOTA THERMAL PRINT */
     @media print {
       body * { visibility: hidden; }
       #printable-receipt, #printable-receipt * { visibility: visible; }
-      #printable-receipt {
-        position: absolute; left: 0; top: 0; width: 100%; max-width: 80mm; padding: 0; margin: 0; box-shadow: none; border-radius: 0;
-      }
+      #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; max-width: 80mm; padding: 0; margin: 0; box-shadow: none; border-radius: 0; }
       .modal-backdrop, .modal { display: none !important; }
     }
 
@@ -213,27 +220,19 @@
       .pos-layout { grid-template-columns: minmax(0, 1fr) 350px; }
       .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-    @media(max-width: 900px) {
-      .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-      .sidebar.open { transform: translateX(0); }
-      .main-area { margin-left: 0; width: 100%; }
-      .mobile-menu { display: block; }
-      .topbar { padding: 0 20px; }
-      .content { padding: 20px 20px 30px; }
+    @media(max-width: 850px) {
+      .topbar { padding: 0 16px; }
+      .content { padding: 16px; }
       .pos-layout { grid-template-columns: 1fr; }
       .cart-panel { position: relative; top: 0; }
     }
     @media(max-width: 560px) {
-      .topbar { height: 70px; }
-      .page-title h1 { font-size: 18px; }
       .date-pill { display: none; }
-      .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-      .menu-photo { height: 120px; }
-      .menu-body { padding: 12px; }
+      .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .menu-photo { height: 110px; }
+      .menu-body { padding: 10px; }
       .menu-name { font-size: 12px; }
       .menu-price { font-size: 12px; }
-      .add-btn { padding: 6px 10px; font-size: 10px; }
-      .cart-panel { padding: 18px; }
     }
   </style>
 </head>
@@ -241,150 +240,232 @@
 <body>
 <div class="app-shell">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
+  <!-- TOPBAR TERMINAL POS -->
+  <header class="topbar">
     <div class="brand">
       <div class="brand-icon">☕</div>
       <div class="brand-text">
         <strong>Three4Five</strong>
-        <span>Coffee & POS</span>
+        <span>POS Terminal</span>
       </div>
     </div>
 
-    <div class="nav-label">Menu Utama</div>
-    <nav class="side-nav">
-      <button id="nav-kasir" class="active" type="button">
-        <span class="nav-icon">🛒</span>
-        <span>Kasir</span>
-      </button>
-    </nav>
-
-    <div class="sidebar-bottom">
-      <div class="cashier-profile">
+    <div class="cashier-info">
+      <div class="date-pill" id="current-date">--/--/----</div>
+      <div class="cashier-badge">
         <div class="avatar">K</div>
-        <div>
-          <strong>Kasir</strong>
-          <span>Three4Five Coffee</span>
-        </div>
+        <span>Kasir Utama</span>
       </div>
     </div>
-  </aside>
+  </header>
 
-  <!-- MAIN AREA -->
-  <div class="main-area">
-    <header class="topbar">
-      <div class="d-flex align-items-center gap-3">
-        <button class="mobile-menu" id="mobile-menu" type="button">☰</button>
-        <div class="page-title">
-          <h1 id="page-title">Kasir</h1>
-          <p id="page-subtitle">Kelola pesanan dan pembayaran pelanggan</p>
-        </div>
-      </div>
-      <div class="top-actions">
-        <div class="date-pill" id="current-date"></div>
-      </div>
-    </header>
+  <main class="content">
+    <section id="view-kasir">
+      <div class="pos-layout">
 
-    <main class="content">
-
-      <!-- KASIR VIEW -->
-      <section id="view-kasir">
-        <div class="pos-layout">
-
-          <div>
-            <div class="section-head">
-              <h2>Daftar Menu</h2>
-              <span id="menu-count">0 menu</span>
+        <!-- METODE UTAMA: KATALOG & GRID MENU -->
+        <div>
+          <div class="section-head">
+            <h2>Katalog Produk</h2>
+            <div class="head-actions">
+              <span class="badge-count" id="menu-count">0 produk</span>
+              <button class="btn-add-menu" type="button" onclick="openAddMenuModal()">
+                <span>+</span> Tambah Menu
+              </button>
             </div>
-
-            <div class="category-bar" id="category-bar">
-              <button class="category-btn active" data-category="all" type="button">Semua Menu</button>
-              <button class="category-btn" data-category="ice-coffee" type="button">Ice Coffee</button>
-              <button class="category-btn" data-category="americano" type="button">Americano</button>
-              <button class="category-btn" data-category="non-coffee" type="button">Non Coffee</button>
-            </div>
-
-            <div class="menu-grid" id="menu-grid"></div>
           </div>
 
-          <!-- CART PANEL -->
-          <aside class="cart-panel">
-            <div class="cart-head">
-              <h2>Pesanan Saat Ini</h2>
-              <div class="cart-count" id="cart-count">0</div>
-            </div>
+          <div class="category-bar" id="category-bar">
+            <button class="category-btn active" data-category="all" type="button">Semua Menu</button>
+            <button class="category-btn" data-category="ice-coffee" type="button">Ice Coffee</button>
+            <button class="category-btn" data-category="americano" type="button">Americano</button>
+            <button class="category-btn" data-category="non-coffee" type="button">Non Coffee</button>
+          </div>
 
-            <div id="cart-list" class="cart-list">
-              <div class="empty-cart">
-                <div style="font-size:32px;margin-bottom:8px">🛍️</div>
-                Belum ada menu yang dipilih
-              </div>
-            </div>
-
-            <div class="summary">
-              <div class="summary-row">
-                <span>Subtotal</span>
-                <strong id="subtotal-text">Rp 0</strong>
-              </div>
-              <div class="summary-row">
-                <span>Pajak</span>
-                <strong>Rp 0</strong>
-              </div>
-
-              <div class="summary-total">
-                <span>Total Bayar</span>
-                <strong id="total-text">Rp 0</strong>
-              </div>
-
-              <div class="change-row" id="change-row">
-                <span>Kembalian</span>
-                <strong id="change-text">Rp 0</strong>
-              </div>
-
-              <div class="payment-title">Metode Pembayaran</div>
-
-              <div class="payment-options">
-                <div class="payment-option">
-                  <input type="radio" name="payment" id="pay-tunai" value="Tunai" checked>
-                  <label for="pay-tunai">💵 Tunai</label>
-                </div>
-                <div class="payment-option">
-                  <input type="radio" name="payment" id="pay-qris" value="QRIS">
-                  <label for="pay-qris">▦ QRIS</label>
-                </div>
-              </div>
-
-              <div class="cash-wrap" id="cash-wrap">
-                <input id="cash-received" placeholder="Nominal uang diterima..." type="number" min="0">
-              </div>
-
-              <button id="btn-pay" class="pay-btn" type="button">Proses Pembayaran</button>
-            </div>
-          </aside>
-
+          <div class="menu-grid" id="menu-grid"></div>
         </div>
-      </section>
 
-    </main>
+        <!-- TERMINAL KASIR / PANEL TRANSAKSI -->
+        <aside class="cart-panel">
+          <div class="cart-head">
+            <h2>Rincian Pesanan</h2>
+            <div class="cart-count" id="cart-count">0</div>
+          </div>
 
-    <footer>&copy; Three4Five Coffee · Point of Sale System</footer>
+          <div id="cart-list" class="cart-list">
+            <div class="empty-cart">
+              <div style="font-size:32px;margin-bottom:8px">🛍️</div>
+              Belum ada pesanan terpilih
+            </div>
+          </div>
+
+          <div class="summary">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <strong id="subtotal-text">Rp 0</strong>
+            </div>
+            <div class="summary-row">
+              <span>Pajak (0%)</span>
+              <strong>Rp 0</strong>
+            </div>
+
+            <div class="summary-total">
+              <span>Total Tagihan</span>
+              <strong id="total-text">Rp 0</strong>
+            </div>
+
+            <div class="change-row" id="change-row">
+              <span>Kembalian</span>
+              <strong id="change-text">Rp 0</strong>
+            </div>
+
+            <div class="payment-title">Metode Pembayaran</div>
+
+            <div class="payment-options">
+              <div class="payment-option">
+                <input type="radio" name="payment" id="pay-tunai" value="Tunai" checked>
+                <label for="pay-tunai">💵 Tunai</label>
+              </div>
+              <div class="payment-option">
+                <input type="radio" name="payment" id="pay-qris" value="QRIS">
+                <label for="pay-qris">▦ QRIS</label>
+              </div>
+            </div>
+
+            <div class="cash-wrap" id="cash-wrap">
+              <input id="cash-received" placeholder="Nominal Uang Diterima..." type="number" min="0">
+            </div>
+
+            <button id="btn-pay" class="pay-btn" type="button">Selesaikan Transaksi</button>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>&copy; Three4Five Coffee · Professional Point of Sale</footer>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast-message" id="toast-message"></div>
+
+<!-- MODAL TAMBAH MENU BARU -->
+<div class="modal fade" id="addMenuModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 16px; border: 0; overflow: hidden;">
+      <div class="modal-header" style="background: var(--brand-dark); color: #fff; padding: 16px 20px;">
+        <h5 class="modal-title" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;">Tambah Menu Baru</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="form-add-menu">
+        <div class="modal-body" style="padding: 20px;">
+          <div class="mb-3">
+            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Nama Menu</label>
+            <input type="text" id="add-name" class="form-control" placeholder="Contoh: Caramel Latte" required style="border-radius: 8px; font-size: 13px;">
+          </div>
+          
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Harga (Rp)</label>
+              <input type="number" id="add-price" class="form-control" placeholder="22000" required min="0" style="border-radius: 8px; font-size: 13px;">
+            </div>
+            <div class="col-6">
+              <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Stok Awalan</label>
+              <input type="number" id="add-stock" class="form-control" placeholder="50" required min="0" style="border-radius: 8px; font-size: 13px;">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Kategori</label>
+            <select id="add-category" class="form-select" style="border-radius: 8px; font-size: 13px;">
+              <option value="ice-coffee">Ice Coffee</option>
+              <option value="americano">Americano</option>
+              <option value="non-coffee">Non Coffee</option>
+            </select>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Link Gambar / Link Google Drive</label>
+            <input type="text" id="add-image" class="form-control" style="border-radius: 8px; font-size: 13px;" placeholder="Paste link Google Drive atau URL Gambar...">
+            <div class="drive-info-box">
+              💡 <strong>Tips Google Drive:</strong> Cukup tempel link share Drive (contoh: <code>https://drive.google.com/file/d/1ABC.../view</code>). System akan otomatis mengonversinya menjadi URL gambar langsung!
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid var(--border-color); padding: 12px 20px;">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600; font-size: 12px;">Batal</button>
+          <button type="submit" id="btn-save-add-menu" class="btn" style="background: var(--brand-main); color: #fff; border-radius: 8px; font-weight: 700; font-size: 12px;">+ Tambah Menu</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast-message" id="toast-message"></div>
+<!-- MODAL EDIT MENU -->
+<div class="modal fade" id="editMenuModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 16px; border: 0; overflow: hidden;">
+      <div class="modal-header" style="background: var(--brand-dark); color: #fff; padding: 16px 20px;">
+        <h5 class="modal-title" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;">Edit Data Menu</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="form-edit-menu">
+        <div class="modal-body" style="padding: 20px;">
+          <input type="hidden" id="edit-id">
+          
+          <div class="mb-3">
+            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Nama Menu</label>
+            <input type="text" id="edit-name" class="form-control" required style="border-radius: 8px; font-size: 13px;">
+          </div>
+          
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Harga (Rp)</label>
+              <input type="number" id="edit-price" class="form-control" required min="0" style="border-radius: 8px; font-size: 13px;">
+            </div>
+            <div class="col-6">
+              <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Stok</label>
+              <input type="number" id="edit-stock" class="form-control" required min="0" style="border-radius: 8px; font-size: 13px;">
+            </div>
+          </div>
 
-<!-- MODAL CETAK NOTA -->
+          <div class="mb-3">
+            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Kategori</label>
+            <select id="edit-category" class="form-select" style="border-radius: 8px; font-size: 13px;">
+              <option value="ice-coffee">Ice Coffee</option>
+              <option value="americano">Americano</option>
+              <option value="non-coffee">Non Coffee</option>
+            </select>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Link Gambar / Link Google Drive</label>
+            <input type="text" id="edit-image" class="form-control" style="border-radius: 8px; font-size: 13px;" placeholder="Paste link Google Drive atau URL Gambar...">
+            <div class="drive-info-box">
+              💡 <strong>Tips Google Drive:</strong> Bisa langsung menempelkan URL share Google Drive.
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid var(--border-color); padding: 12px 20px;">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600; font-size: 12px;">Batal</button>
+          <button type="submit" id="btn-save-menu" class="btn" style="background: var(--brand-main); color: #fff; border-radius: 8px; font-weight: 700; font-size: 12px;">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CETAK NOTA PEMBELIAN -->
 <div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius: 18px; overflow: hidden; border: 0;">
-      <div class="modal-header" style="background: var(--green-dark); color: #fff; border: 0; padding: 18px 24px;">
-        <h5 class="modal-title" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;">Transaksi Berhasil</h5>
+    <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: 0;">
+      <div class="modal-header" style="background: var(--brand-dark); color: #fff; border: 0; padding: 16px 20px;">
+        <h5 class="modal-title" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px;">Transaksi Sukses</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="receipt-modal-body">
         
-        <!-- STRUK / NOTA PEMBELIAN -->
         <div class="receipt-paper" id="printable-receipt">
           <div class="receipt-header">
             <h3>Three4Five Coffee</h3>
@@ -411,15 +492,15 @@
         </div>
 
       </div>
-      <div class="modal-footer" style="background: #fff; border-top: 1px solid var(--border-color); padding: 14px 24px;">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 10px; font-weight: 600; font-size: 12px; padding: 10px 18px;">Tutup</button>
-        <button type="button" class="btn" onclick="window.print()" style="background: var(--green-main); color: #fff; border-radius: 10px; font-weight: 700; font-size: 12px; padding: 10px 20px;">🖨️ Cetak Nota</button>
+      <div class="modal-footer" style="background: #fff; border-top: 1px solid var(--border-color); padding: 12px 20px;">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600; font-size: 12px;">Tutup</button>
+        <button type="button" class="btn" onclick="window.print()" style="background: var(--brand-main); color: #fff; border-radius: 8px; font-weight: 700; font-size: 12px;">🖨️ Cetak Nota</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Config App Script -->
+<!-- Configuration Scripts -->
 <script>
   window.__three4five_config = {
     APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyep_2ZvPePJfNLAhsFteZnjRmxZ0cGPhzrorCUibVrKasE87gI5U9Ube6JSbXsBQdJ4g/exec',
@@ -434,12 +515,14 @@
 
 <script>
   /* =========================================================
-     APP STATE & UTILS
+     APP STATE & UTILITY FUNCTIONS
      ========================================================= */
   let menuList = [];
   let cart = [];
   let activeCategory = 'all';
   let receiptModalInstance = null;
+  let editMenuModalInstance = null;
+  let addMenuModalInstance = null;
 
   function formatRupiah(n){
     return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID');
@@ -452,6 +535,17 @@
       .replace(/>/g,'&gt;')
       .replace(/"/g,'&quot;')
       .replace(/'/g,'&#039;');
+  }
+
+  /* UTILITY: KONVERSI LINK GOOGLE DRIVE KE DIRECT IMAGE URL */
+  function convertDriveUrl(url) {
+    if (!url) return '';
+    const driveRegex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)|lh3\.googleusercontent\.com\/d\/)([a-zA-Z0-9_-]+)/;
+    const match = url.match(driveRegex);
+    if (match && match[1]) {
+      return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+    }
+    return url;
   }
 
   function categoryName(category){
@@ -482,7 +576,7 @@
   }
 
   /* =========================================================
-     LOAD DATA FROM SHEETS
+     SYNC / LOAD DATA SHEETS
      ========================================================= */
   async function loadDataFromSheets(){
     try{
@@ -496,7 +590,7 @@
   }
 
   /* =========================================================
-     RENDER MENU
+     RENDER MENU GRID
      ========================================================= */
   function renderMenu(){
     const grid = document.getElementById('menu-grid');
@@ -506,7 +600,7 @@
       ? menuList
       : menuList.filter(item => String(item.category || '').toLowerCase() === activeCategory);
 
-    document.getElementById('menu-count').textContent = `${filtered.length} menu`;
+    document.getElementById('menu-count').textContent = `${filtered.length} produk`;
 
     if(!filtered.length){
       grid.innerHTML = `
@@ -522,12 +616,17 @@
       col.className = 'col-md-4';
 
       const stock = Number(item.stock) || 0;
-      const image = item.image || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
+      const rawImg = item.image || 'https://via.placeholder.com/600x400?text=Three4Five+Coffee';
+      const image = convertDriveUrl(rawImg);
 
       col.innerHTML = `
         <div class="menu-card">
+          <button class="edit-menu-btn" type="button" title="Edit Menu" onclick="openEditMenuModal('${String(item.id).replace(/'/g,"\\'")}')">
+            ✏️
+          </button>
+
           <div class="menu-photo">
-            <img src="${escapeHtml(image)}" alt="${escapeHtml(item.name || 'Menu')}">
+            <img src="${escapeHtml(image)}" alt="${escapeHtml(item.name || 'Menu')}" onerror="this.onerror=null;this.src='https://via.placeholder.com/600x400?text=Kopi+Image';">
             <span class="stock-badge">Stok ${stock}</span>
           </div>
 
@@ -560,7 +659,133 @@
   });
 
   /* =========================================================
-     CART LOGIC
+     MODAL & PROSES TAMBAH MENU BARU
+     ========================================================= */
+  function openAddMenuModal(){
+    document.getElementById('form-add-menu').reset();
+    addMenuModalInstance.show();
+  }
+
+  document.getElementById('form-add-menu').addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    const rawImageInput = document.getElementById('add-image').value.trim();
+    const finalImage = convertDriveUrl(rawImageInput);
+
+    const newMenuData = {
+      id: 'MNU-' + Date.now().toString().slice(-6),
+      name: document.getElementById('add-name').value.trim(),
+      price: Number(document.getElementById('add-price').value) || 0,
+      stock: Number(document.getElementById('add-stock').value) || 0,
+      category: document.getElementById('add-category').value,
+      image: finalImage
+    };
+
+    const submitBtn = document.getElementById('btn-save-add-menu');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Menyimpan...';
+
+    try {
+      let ok = false;
+      if (window.__three4five_sheets && typeof window.__three4five_sheets.addMenu === 'function') {
+        const res = await window.__three4five_sheets.addMenu(newMenuData);
+        ok = res && res.ok;
+      } else if (window.__three4five_sheets && typeof window.__three4five_sheets.saveMenu === 'function') {
+        const res = await window.__three4five_sheets.saveMenu(newMenuData);
+        ok = res && res.ok;
+      } else {
+        // Fallback simpan lokal
+        menuList.push(newMenuData);
+        ok = true;
+      }
+
+      if (ok) {
+        showToast('✓ Menu baru berhasil ditambahkan');
+        addMenuModalInstance.hide();
+        await loadDataFromSheets();
+      } else {
+        showToast('Gagal menambahkan menu baru');
+      }
+    } catch(err) {
+      console.error(err);
+      showToast('Terjadi kesalahan saat menyimpan menu');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  });
+
+  /* =========================================================
+     MODAL & PROSES EDIT MENU
+     ========================================================= */
+  function openEditMenuModal(id){
+    const item = menuList.find(m => String(m.id) === String(id));
+    if(!item) return;
+
+    document.getElementById('edit-id').value = item.id;
+    document.getElementById('edit-name').value = item.name || '';
+    document.getElementById('edit-price').value = Number(item.price) || 0;
+    document.getElementById('edit-stock').value = Number(item.stock) || 0;
+    document.getElementById('edit-category').value = String(item.category || 'ice-coffee').toLowerCase();
+    document.getElementById('edit-image').value = item.image || '';
+
+    editMenuModalInstance.show();
+  }
+
+  document.getElementById('form-edit-menu').addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    const id = document.getElementById('edit-id').value;
+    const rawImageInput = document.getElementById('edit-image').value.trim();
+    const finalImage = convertDriveUrl(rawImageInput);
+
+    const updatedData = {
+      id: id,
+      name: document.getElementById('edit-name').value.trim(),
+      price: Number(document.getElementById('edit-price').value) || 0,
+      stock: Number(document.getElementById('edit-stock').value) || 0,
+      category: document.getElementById('edit-category').value,
+      image: finalImage
+    };
+
+    const submitBtn = document.getElementById('btn-save-menu');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Menyimpan...';
+
+    try {
+      let ok = false;
+      if (window.__three4five_sheets && typeof window.__three4five_sheets.saveMenu === 'function') {
+        const res = await window.__three4five_sheets.saveMenu(updatedData);
+        ok = res && res.ok;
+      } else {
+        // Fallback update lokal
+        const index = menuList.findIndex(m => String(m.id) === String(id));
+        if (index !== -1) {
+          menuList[index] = { ...menuList[index], ...updatedData };
+          ok = true;
+        }
+      }
+
+      if (ok) {
+        showToast('✓ Menu berhasil diperbarui');
+        editMenuModalInstance.hide();
+        await loadDataFromSheets();
+      } else {
+        showToast('Gagal memperbarui menu');
+      }
+    } catch(err) {
+      console.error(err);
+      showToast('Terjadi kesalahan saat menyimpan');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  });
+
+  /* =========================================================
+     MANAJEMEN KERANJANG (CART)
      ========================================================= */
   function addToCart(id){
     const item = menuList.find(m => String(m.id) === String(id));
@@ -598,7 +823,7 @@
       el.innerHTML = `
         <div class="empty-cart">
           <div style="font-size:32px;margin-bottom:8px">🛍️</div>
-          Belum ada menu yang dipilih
+          Belum ada pesanan terpilih
         </div>`;
 
       document.getElementById('subtotal-text').innerText = formatRupiah(0);
@@ -641,7 +866,7 @@
   }
 
   /* =========================================================
-     PAYMENT & CHANGE CALCULATION
+     METODE PEMBAYARAN & HITUNG KEMBALIAN
      ========================================================= */
   function getPaymentMethod(){
     const checked = document.querySelector('input[name="payment"]:checked');
@@ -683,7 +908,7 @@
   document.getElementById('cash-received').addEventListener('input', calculateChange);
 
   /* =========================================================
-     PROSES BAYAR & CETAK NOTA
+     PROSES PEMBAYARAN & STRUK
      ========================================================= */
   document.getElementById('btn-pay').addEventListener('click', async function(){
     if(cart.length === 0){
@@ -726,11 +951,9 @@
       if(r && r.ok){
         showToast('✓ Transaksi berhasil');
         
-        // Populate Struk Modal
         populateReceipt(trx, now);
         receiptModalInstance.show();
 
-        // Reset Cart
         cart = [];
         document.getElementById('cash-received').value = '';
         renderCart();
@@ -770,20 +993,15 @@
   }
 
   /* =========================================================
-     INITIALIZATION & NAVIGATION
+     INITIALIZATION
      ========================================================= */
-  const sidebar = document.getElementById('sidebar');
-  const mobileMenuBtn = document.getElementById('mobile-menu');
-
-  mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('open');
-  });
-
   document.addEventListener('DOMContentLoaded', async function() {
     updateDate();
     renderCart();
     
     receiptModalInstance = new bootstrap.Modal(document.getElementById('receiptModal'));
+    editMenuModalInstance = new bootstrap.Modal(document.getElementById('editMenuModal'));
+    addMenuModalInstance = new bootstrap.Modal(document.getElementById('addMenuModal'));
     
     if (window.__three4five_config && window.__three4five_config.forceSyncOnLoad) {
       await loadDataFromSheets();
