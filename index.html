@@ -5,210 +5,235 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Three4Five Coffee — POS</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    :root{
-      --green:#064e3b;
-      --green-dark:#022c22;
-      --green-soft:#e8f3ef;
-      --cream:#f7f5ef;
-      --bg:#f4f6f5;
-      --white:#ffffff;
-      --text:#17211d;
-      --muted:#7a8580;
-      --line:#e5e9e7;
-      --danger:#c0392b;
-      --shadow:0 12px 35px rgba(19,42,34,.07);
-      --radius:18px;
+    :root {
+      --green-dark: #08291e;
+      --green-main: #0e4d37;
+      --green-light: #166c4e;
+      --green-soft: #eaf4f0;
+      --green-accent: #10b981;
+      --cream-bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 2px 8px rgba(14, 77, 55, 0.04);
+      --shadow-md: 0 10px 25px -5px rgba(14, 77, 55, 0.08);
+      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+      --radius: 16px;
     }
 
-    *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
-    button,input,select{font-family:inherit}
-    button{cursor:pointer}
-    .hidden{display:none!important}
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; font-family: 'Plus Jakarta Sans', sans-serif; background: #f3f5f4; color: var(--text-main); }
+    button, input, select { font-family: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
 
-    /* APP SHELL */
-    .app-shell{min-height:100vh;display:flex}
+    /* LAYOUT & SIDEBAR */
+    .app-shell { min-height: 100vh; display: flex; }
 
-    .sidebar{
-      width:245px;min-height:100vh;background:var(--green-dark);color:#fff;
-      padding:24px 16px;position:fixed;left:0;top:0;bottom:0;z-index:1050;
-      display:flex;flex-direction:column;
+    .sidebar {
+      width: 250px; min-height: 100vh; background: var(--green-dark); color: #fff;
+      padding: 28px 18px; position: fixed; left: 0; top: 0; bottom: 0; z-index: 1050;
+      display: flex; flex-direction: column; border-right: 1px solid rgba(255,255,255,0.05);
     }
 
-    .brand{display:flex;align-items:center;gap:12px;padding:3px 10px 28px}
-    .brand-icon{
-      width:43px;height:43px;border-radius:13px;background:#fff;color:var(--green);
-      display:flex;align-items:center;justify-content:center;font-size:21px;
-      box-shadow:0 8px 20px rgba(0,0,0,.15)
+    .brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 32px; }
+    .brand-icon {
+      width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #22c55e, #0e4d37);
+      color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px;
+      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
     }
-    .brand-text strong{font-family:'Poppins',sans-serif;font-size:17px;display:block;letter-spacing:-.3px}
-    .brand-text span{font-size:10px;color:#a9c3b9;letter-spacing:1.5px;text-transform:uppercase}
+    .brand-text strong { font-family: 'Space Grotesk', sans-serif; font-size: 18px; display: block; letter-spacing: -0.3px; color: #fff; }
+    .brand-text span { font-size: 10px; color: var(--green-accent); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
 
-    .nav-label{font-size:10px;color:#78978c;text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px 10px}
-    .side-nav{display:flex;flex-direction:column;gap:5px}
-    .side-nav button{
-      border:0;background:transparent;color:#b7c9c2;border-radius:12px;
-      padding:12px 13px;text-align:left;display:flex;align-items:center;gap:11px;
-      font-size:13px;font-weight:600;transition:.2s;
+    .nav-label { font-size: 10px; color: #5a7d71; text-transform: uppercase; letter-spacing: 1.5px; padding: 0 12px 12px; font-weight: 700; }
+    .side-nav button {
+      width: 100%; border: 0; background: rgba(255,255,255,0.03); color: #a3b8b0; border-radius: 12px;
+      padding: 14px 16px; text-align: left; display: flex; align-items: center; gap: 12px;
+      font-size: 13px; font-weight: 600; transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.04);
     }
-    .side-nav button:hover{background:rgba(255,255,255,.07);color:#fff}
-    .side-nav button.active{background:#fff;color:var(--green-dark);box-shadow:0 8px 20px rgba(0,0,0,.12)}
-    .nav-icon{width:24px;text-align:center;font-size:17px}
+    .side-nav button:hover, .side-nav button.active { background: #fff; color: var(--green-dark); box-shadow: var(--shadow-md); font-weight: 700; border-color: #fff; }
+    .nav-icon { font-size: 16px; }
 
-    .sidebar-bottom{margin-top:auto;border-top:1px solid rgba(255,255,255,.09);padding:18px 10px 4px}
-    .cashier-profile{display:flex;align-items:center;gap:10px}
-    .avatar{width:38px;height:38px;border-radius:50%;background:#dbeae4;color:var(--green-dark);display:flex;align-items:center;justify-content:center;font-weight:800}
-    .cashier-profile strong{display:block;font-size:12px}
-    .cashier-profile span{font-size:10px;color:#8da79e}
+    .sidebar-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; }
+    .cashier-profile { display: flex; align-items: center; gap: 12px; padding: 4px; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--green-light); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; border: 2px solid rgba(255,255,255,0.2); }
+    .cashier-profile strong { display: block; font-size: 13px; color: #fff; }
+    .cashier-profile span { font-size: 11px; color: #7f9f93; }
 
-    /* MAIN */
-    .main-area{margin-left:245px;width:calc(100% - 245px);min-width:0}
-    .topbar{
-      height:76px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--line);display:flex;align-items:center;
-      justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:900;
+    /* MAIN & TOPBAR */
+    .main-area { margin-left: 250px; width: calc(100% - 250px); min-width: 0; }
+    .topbar {
+      height: 80px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color); display: flex; align-items: center;
+      justify-content: space-between; padding: 0 36px; position: sticky; top: 0; z-index: 900;
     }
-    .page-title h1{font-family:'Poppins',sans-serif;font-size:20px;margin:0;font-weight:700}
-    .page-title p{margin:3px 0 0;color:var(--muted);font-size:11px}
-    .top-actions{display:flex;align-items:center;gap:10px}
-    .date-pill{background:#f4f7f5;border:1px solid var(--line);padding:9px 13px;border-radius:11px;font-size:11px;color:#66726d}
-    .mobile-menu{display:none;border:0;background:var(--green);color:#fff;border-radius:10px;width:40px;height:40px}
+    .page-title h1 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; margin: 0; font-weight: 700; color: var(--green-dark); }
+    .page-title p { margin: 2px 0 0; color: var(--text-muted); font-size: 12px; }
+    .date-pill { background: #fff; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 30px; font-size: 12px; color: var(--text-main); font-weight: 600; box-shadow: var(--shadow-sm); }
+    .mobile-menu { display: none; border: 0; background: var(--green-main); color: #fff; border-radius: 10px; width: 42px; height: 42px; font-size: 18px; }
 
-    .content{padding:28px 32px 40px}
+    .content { padding: 32px 36px; }
 
-    /* KASIR */
-    .pos-layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;align-items:start}
-    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
-    .section-head h2{font-family:'Poppins',sans-serif;font-size:17px;margin:0}
-    .section-head span{font-size:11px;color:var(--muted)}
+    /* KASIR POS */
+    .pos-layout { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 28px; align-items: start; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .section-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin: 0; font-weight: 700; color: var(--green-dark); }
+    .section-head span { font-size: 12px; color: var(--text-muted); background: #e5e7eb; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
 
-    .category-bar{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 14px;scrollbar-width:none}
-    .category-bar::-webkit-scrollbar{display:none}
-    .category-btn{
-      border:1px solid var(--line);background:#fff;color:#69746f;
-      padding:9px 16px;border-radius:10px;font-size:11px;font-weight:700;
-      white-space:nowrap;transition:.2s;
+    .category-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
+    .category-bar::-webkit-scrollbar { display: none; }
+    .category-btn {
+      border: 1px solid var(--border-color); background: #fff; color: var(--text-muted);
+      padding: 10px 20px; border-radius: 30px; font-size: 12px; font-weight: 600;
+      white-space: nowrap; transition: all 0.2s; box-shadow: var(--shadow-sm);
     }
-    .category-btn:hover,.category-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+    .category-btn:hover, .category-btn.active { background: var(--green-main); border-color: var(--green-main); color: #fff; box-shadow: 0 4px 12px rgba(14, 77, 55, 0.2); }
 
-    .menu-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-    .menu-grid>.col-md-4{width:auto;padding:0!important}
-    .menu-card{
-      background:#fff;border:1px solid var(--line);border-radius:17px;overflow:hidden;
-      box-shadow:0 5px 18px rgba(19,42,34,.04);transition:.22s;height:100%;
-      display:flex;flex-direction:column;
+    .menu-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .menu-grid > .col-md-4 { width: auto; padding: 0 !important; }
+    .menu-card {
+      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden;
+      box-shadow: var(--shadow-sm); transition: all 0.25s ease; height: 100%; display: flex; flex-direction: column; position: relative;
     }
-    .menu-card:hover{transform:translateY(-3px);box-shadow:0 13px 28px rgba(19,42,34,.1)}
-    .menu-photo{height:150px;position:relative;background:#e9eeeb;overflow:hidden}
-    .menu-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s}
-    .menu-card:hover .menu-photo img{transform:scale(1.035)}
-    .stock-badge{
-      position:absolute;top:10px;right:10px;background:rgba(255,255,255,.93);
-      padding:5px 8px;border-radius:8px;font-size:9px;font-weight:700;color:var(--green);
+    .menu-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(14, 77, 55, 0.2); }
+    .menu-photo { height: 160px; position: relative; background: #f3f4f6; overflow: hidden; }
+    .menu-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+    .menu-card:hover .menu-photo img { transform: scale(1.06); }
+    .stock-badge {
+      position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
+      padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; color: var(--green-main); box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
-    .menu-body{padding:13px;display:flex;flex-direction:column;flex:1}
-    .menu-category{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#8a9791;font-weight:700;margin-bottom:5px}
-    .menu-name{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;margin-bottom:7px;line-height:1.3}
-    .menu-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;gap:8px}
-    .menu-price{font-size:13px;font-weight:800;color:var(--green)}
-    .add-btn{
-      border:0;background:var(--green);color:#fff;border-radius:9px;padding:8px 11px;
-      font-size:10px;font-weight:800;transition:.2s;
+    .menu-body { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+    .menu-category { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--green-accent); font-weight: 800; margin-bottom: 4px; }
+    .menu-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; color: var(--text-main); }
+    .menu-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 8px; }
+    .menu-price { font-size: 14px; font-weight: 800; color: var(--green-main); }
+    .add-btn {
+      border: 0; background: var(--green-soft); color: var(--green-main); border-radius: 10px; padding: 8px 14px;
+      font-size: 11px; font-weight: 700; transition: all 0.2s;
     }
-    .add-btn:hover{background:var(--green-dark)}
-    .empty-menu{grid-column:1/-1;background:#fff;border:1px dashed #ccd5d1;border-radius:15px;padding:45px 20px;text-align:center;color:var(--muted);font-size:12px}
+    .add-btn:hover { background: var(--green-main); color: #fff; }
+    .empty-menu { grid-column: 1 / -1; background: #fff; border: 2px dashed var(--border-color); border-radius: var(--radius); padding: 50px 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
 
-    /* CART */
-    .cart-panel{
-      background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);
-      padding:20px;position:sticky;top:96px;
+    /* CART PANEL */
+    .cart-panel {
+      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-md);
+      padding: 24px; position: sticky; top: 104px;
     }
-    .cart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px}
-    .cart-head h2{font-family:'Poppins',sans-serif;font-size:16px;margin:0}
-    .cart-count{min-width:25px;height:25px;border-radius:8px;background:var(--green-soft);color:var(--green);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
-    .cart-list{min-height:80px;max-height:310px;overflow:auto;border-bottom:1px solid var(--line);padding-bottom:8px}
-    .empty-cart{text-align:center;padding:35px 10px;color:#a0aaa6;font-size:11px}
-    .empty-cart .cart-empty-icon{font-size:28px;margin-bottom:7px}
-    .cart-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:11px 0;border-bottom:1px solid #f0f2f1}
-    .cart-item:last-child{border-bottom:0}
-    .cart-item-name{font-size:11px;font-weight:700;margin-bottom:5px}
-    .cart-item-meta{font-size:10px;color:var(--muted)}
-    .cart-item-right{text-align:right}
-    .cart-item-price{font-size:11px;font-weight:800}
-    .remove-btn{border:0;background:none;color:#b2bbb7;font-size:9px;padding:3px 0}
-    .remove-btn:hover{color:var(--danger)}
+    .cart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .cart-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; margin: 0; font-weight: 700; color: var(--green-dark); }
+    .cart-count { min-width: 28px; height: 28px; border-radius: 50%; background: var(--green-main); color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .cart-list { min-height: 100px; max-height: 280px; overflow-y: auto; border-bottom: 1px border-style: dashed; border-color: var(--border-color); padding-bottom: 12px; }
+    .cart-list::-webkit-scrollbar { width: 4px; }
+    .cart-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+    .empty-cart { text-align: center; padding: 40px 10px; color: #9ca3af; font-size: 12px; }
+    .cart-item { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+    .cart-item:last-child { border-bottom: 0; }
+    .cart-item-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; color: var(--text-main); }
+    .cart-item-meta { font-size: 11px; color: var(--text-muted); }
+    .cart-item-right { text-align: right; }
+    .cart-item-price { font-size: 12px; font-weight: 800; color: var(--text-main); }
+    .remove-btn { border: 0; background: none; color: #ef4444; font-size: 10px; padding: 2px 0; font-weight: 600; }
+    .remove-btn:hover { text-decoration: underline; }
 
-    .summary{padding-top:15px}
-    .summary-row{display:flex;justify-content:space-between;font-size:11px;color:#69736f;margin-bottom:9px}
-    .summary-row strong{color:var(--text)}
-    .summary-total{display:flex;justify-content:space-between;align-items:end;border-top:1px dashed #dce2df;padding-top:14px;margin-top:5px;margin-bottom:14px}
-    .summary-total span{font-size:11px;color:var(--muted)}
-    .summary-total strong{font-family:'Poppins',sans-serif;font-size:22px;color:var(--green)}
+    .summary { padding-top: 16px; }
+    .summary-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+    .summary-row strong { color: var(--text-main); }
+    .summary-total { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px dashed var(--border-color); padding-top: 16px; margin-top: 8px; margin-bottom: 16px; }
+    .summary-total span { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .summary-total strong { font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: var(--green-main); font-weight: 700; line-height: 1; }
 
-    .change-row{display:flex;justify-content:space-between;align-items:center;background:var(--green-soft);padding:10px 12px;border-radius:10px;margin-bottom:14px;font-size:11px;color:var(--green-dark)}
-    .change-row strong{font-size:13px;font-weight:800}
+    .change-row { display: flex; justify-content: space-between; align-items: center; background: var(--green-soft); padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 12px; color: var(--green-dark); font-weight: 600; }
+    .change-row strong { font-size: 15px; font-weight: 800; color: var(--green-main); }
 
-    .payment-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#7c8883;font-weight:800;margin-bottom:8px}
-    .payment-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
-    .payment-option{position:relative}
-    .payment-option input{position:absolute;opacity:0}
-    .payment-option label{
-      display:flex;align-items:center;justify-content:center;padding:10px;border:1px solid var(--line);
-      border-radius:10px;font-size:10px;font-weight:700;color:#68736f;background:#fff;cursor:pointer;transition:.2s;
+    .payment-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; }
+    .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .payment-option position: relative; }
+    .payment-option input { position: absolute; opacity: 0; }
+    .payment-option label {
+      display: flex; align-items: center; justify-content: center; padding: 10px; border: 1.5px solid var(--border-color);
+      border-radius: 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); background: #fff; cursor: pointer; transition: all 0.2s;
     }
-    .payment-option input:checked+label{border-color:var(--green);background:var(--green-soft);color:var(--green)}
-    .cash-wrap{margin-bottom:10px}
-    .cash-wrap input{height:40px;border:1px solid var(--line);border-radius:10px;font-size:11px;padding:0 12px;outline:none;width:100%}
-    .cash-wrap input:focus{border-color:#83a99c;box-shadow:0 0 0 3px rgba(6,78,59,.07)}
-    .pay-btn{
-      width:100%;height:46px;border:0;border-radius:11px;background:var(--green);color:#fff;
-      font-size:11px;font-weight:800;box-shadow:0 8px 17px rgba(6,78,59,.18);transition:.2s;
+    .payment-option input:checked + label { border-color: var(--green-main); background: var(--green-soft); color: var(--green-main); }
+    .cash-wrap { margin-bottom: 14px; }
+    .cash-wrap input { height: 44px; border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 12px; font-weight: 600; padding: 0 14px; outline: none; width: 100%; transition: all 0.2s; }
+    .cash-wrap input:focus { border-color: var(--green-main); box-shadow: 0 0 0 4px rgba(14, 77, 55, 0.08); }
+    
+    .pay-btn {
+      width: 100%; height: 50px; border: 0; border-radius: 12px; background: var(--green-main); color: #fff;
+      font-size: 12px; font-weight: 800; box-shadow: 0 10px 20px rgba(14, 77, 55, 0.2); transition: all 0.2s;
+      letter-spacing: 0.5px;
     }
-    .pay-btn:hover{background:var(--green-dark);transform:translateY(-1px)}
-    .pay-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .pay-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
     /* TOAST */
-    .toast-message{
-      position:fixed;right:24px;bottom:24px;z-index:3000;background:var(--green-dark);color:#fff;
-      padding:12px 16px;border-radius:11px;font-size:11px;box-shadow:0 12px 30px rgba(0,0,0,.18);
-      opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s;
+    .toast-message {
+      position: fixed; right: 28px; bottom: 28px; z-index: 3000; background: var(--green-dark); color: #fff;
+      padding: 14px 20px; border-radius: 12px; font-size: 12px; font-weight: 600; box-shadow: var(--shadow-lg);
+      opacity: 0; transform: translateY(12px); pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .toast-message.show{opacity:1;transform:translateY(0)}
+    .toast-message.show { opacity: 1; transform: translateY(0); }
 
-    footer{font-size:10px;color:#9aa49f;text-align:center;padding:0 20px 20px}
+    /* STRUK MODAL & NOTA (PRINT PREVIEW) */
+    .receipt-modal-body { background: #f3f4f6; padding: 24px; display: flex; justify-content: center; }
+    .receipt-paper {
+      background: #fff; width: 100%; max-width: 320px; padding: 24px 20px; border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08); font-family: 'Courier New', Courier, monospace; font-size: 12px; color: #000;
+    }
+    .receipt-header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 12px; margin-bottom: 12px; }
+    .receipt-header h3 { font-size: 16px; font-weight: bold; margin: 0 0 4px; text-transform: uppercase; }
+    .receipt-header p { margin: 2px 0; font-size: 10px; color: #333; }
+    .receipt-info { border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 12px; font-size: 11px; }
+    .receipt-info div { display: flex; justify-content: space-between; margin-bottom: 3px; }
+    .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; border-bottom: 1px dashed #000; padding-bottom: 8px; }
+    .receipt-table td { padding: 3px 0; vertical-align: top; }
+    .receipt-totals { margin-bottom: 12px; border-bottom: 1px dashed #000; padding-bottom: 8px; }
+    .receipt-totals div { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px; }
+    .receipt-footer { text-align: center; font-size: 10px; margin-top: 14px; }
 
-    @media(max-width:1150px){
-      .pos-layout{grid-template-columns:minmax(0,1fr) 330px}
-      .menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    footer { font-size: 11px; color: var(--text-muted); text-align: center; padding: 0 20px 24px; font-weight: 500; }
+
+    /* CSS CETAK PRINTER THERMAL (58mm/80mm) */
+    @media print {
+      body * { visibility: hidden; }
+      #printable-receipt, #printable-receipt * { visibility: visible; }
+      #printable-receipt {
+        position: absolute; left: 0; top: 0; width: 100%; max-width: 80mm; padding: 0; margin: 0; box-shadow: none; border-radius: 0;
+      }
+      .modal-backdrop, .modal { display: none !important; }
     }
-    @media(max-width:900px){
-      .sidebar{transform:translateX(-100%);transition:.25s}
-      .sidebar.open{transform:translateX(0)}
-      .main-area{margin-left:0;width:100%}
-      .mobile-menu{display:block}
-      .topbar{padding:0 18px}
-      .content{padding:20px 18px 30px}
-      .pos-layout{grid-template-columns:1fr}
-      .cart-panel{position:relative;top:0}
+
+    @media(max-width: 1150px) {
+      .pos-layout { grid-template-columns: minmax(0, 1fr) 350px; }
+      .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-    @media(max-width:560px){
-      .topbar{height:68px}
-      .page-title h1{font-size:16px}
-      .date-pill{display:none}
-      .menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-      .menu-photo{height:115px}
-      .menu-body{padding:10px}
-      .menu-name{font-size:11px}
-      .menu-price{font-size:11px}
-      .add-btn{padding:7px 8px;font-size:9px}
-      .cart-panel{padding:15px}
+    @media(max-width: 900px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+      .sidebar.open { transform: translateX(0); }
+      .main-area { margin-left: 0; width: 100%; }
+      .mobile-menu { display: block; }
+      .topbar { padding: 0 20px; }
+      .content { padding: 20px 20px 30px; }
+      .pos-layout { grid-template-columns: 1fr; }
+      .cart-panel { position: relative; top: 0; }
     }
-    @media(max-width:370px){
-      .menu-grid{grid-template-columns:1fr}
+    @media(max-width: 560px) {
+      .topbar { height: 70px; }
+      .page-title h1 { font-size: 18px; }
+      .date-pill { display: none; }
+      .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .menu-photo { height: 120px; }
+      .menu-body { padding: 12px; }
+      .menu-name { font-size: 12px; }
+      .menu-price { font-size: 12px; }
+      .add-btn { padding: 6px 10px; font-size: 10px; }
+      .cart-panel { padding: 18px; }
     }
   </style>
 </head>
@@ -229,7 +254,7 @@
     <div class="nav-label">Menu Utama</div>
     <nav class="side-nav">
       <button id="nav-kasir" class="active" type="button">
-        <span class="nav-icon">▣</span>
+        <span class="nav-icon">🛒</span>
         <span>Kasir</span>
       </button>
     </nav>
@@ -245,7 +270,7 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
+  <!-- MAIN AREA -->
   <div class="main-area">
     <header class="topbar">
       <div class="d-flex align-items-center gap-3">
@@ -282,7 +307,7 @@
             <div class="menu-grid" id="menu-grid"></div>
           </div>
 
-          <!-- CART -->
+          <!-- CART PANEL -->
           <aside class="cart-panel">
             <div class="cart-head">
               <h2>Pesanan Saat Ini</h2>
@@ -291,7 +316,7 @@
 
             <div id="cart-list" class="cart-list">
               <div class="empty-cart">
-                <div class="cart-empty-icon">🛒</div>
+                <div style="font-size:32px;margin-bottom:8px">🛍️</div>
                 Belum ada menu yang dipilih
               </div>
             </div>
@@ -307,7 +332,7 @@
               </div>
 
               <div class="summary-total">
-                <span>Total Pembayaran</span>
+                <span>Total Bayar</span>
                 <strong id="total-text">Rp 0</strong>
               </div>
 
@@ -330,7 +355,7 @@
               </div>
 
               <div class="cash-wrap" id="cash-wrap">
-                <input id="cash-received" placeholder="Uang tunai diterima" type="number" min="0">
+                <input id="cash-received" placeholder="Nominal uang diterima..." type="number" min="0">
               </div>
 
               <button id="btn-pay" class="pay-btn" type="button">Proses Pembayaran</button>
@@ -342,13 +367,59 @@
 
     </main>
 
-    <footer>&copy; Three4Five Coffee · Point of Sale</footer>
+    <footer>&copy; Three4Five Coffee · Point of Sale System</footer>
   </div>
 </div>
 
+<!-- TOAST -->
 <div class="toast-message" id="toast-message"></div>
 
-<!-- App Script URL config -->
+<!-- MODAL CETAK NOTA -->
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 18px; overflow: hidden; border: 0;">
+      <div class="modal-header" style="background: var(--green-dark); color: #fff; border: 0; padding: 18px 24px;">
+        <h5 class="modal-title" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;">Transaksi Berhasil</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="receipt-modal-body">
+        
+        <!-- STRUK / NOTA PEMBELIAN -->
+        <div class="receipt-paper" id="printable-receipt">
+          <div class="receipt-header">
+            <h3>Three4Five Coffee</h3>
+            <p>Jl. Raya Utama No. 345</p>
+            <p>Telp: 0812-3456-7890</p>
+          </div>
+          <div class="receipt-info">
+            <div><span>No. Nota:</span><strong id="rec-id">#TRX-000</strong></div>
+            <div><span>Tgl:</span><span id="rec-date">18/08/2026 12:00</span></div>
+            <div><span>Metode:</span><span id="rec-method">Tunai</span></div>
+          </div>
+          <table class="receipt-table">
+            <tbody id="rec-items"></tbody>
+          </table>
+          <div class="receipt-totals">
+            <div><span>Total:</span><strong id="rec-total">Rp 0</strong></div>
+            <div><span>Bayar:</span><span id="rec-cash">Rp 0</span></div>
+            <div><span>Kembali:</span><span id="rec-change">Rp 0</span></div>
+          </div>
+          <div class="receipt-footer">
+            <p>*** TERIMA KASIH ***</p>
+            <p>Selamat Menikmati Kopi Anda</p>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer" style="background: #fff; border-top: 1px solid var(--border-color); padding: 14px 24px;">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 10px; font-weight: 600; font-size: 12px; padding: 10px 18px;">Tutup</button>
+        <button type="button" class="btn" onclick="window.print()" style="background: var(--green-main); color: #fff; border-radius: 10px; font-weight: 700; font-size: 12px; padding: 10px 20px;">🖨️ Cetak Nota</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Config App Script -->
 <script>
   window.__three4five_config = {
     APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyep_2ZvPePJfNLAhsFteZnjRmxZ0cGPhzrorCUibVrKasE87gI5U9Ube6JSbXsBQdJ4g/exec',
@@ -363,11 +434,12 @@
 
 <script>
   /* =========================================================
-     APP STATE
+     APP STATE & UTILS
      ========================================================= */
   let menuList = [];
   let cart = [];
   let activeCategory = 'all';
+  let receiptModalInstance = null;
 
   function formatRupiah(n){
     return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID');
@@ -398,9 +470,6 @@
     window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
   }
 
-  /* =========================================================
-     DATE
-     ========================================================= */
   function updateDate(){
     const el = document.getElementById('current-date');
     const now = new Date();
@@ -413,16 +482,13 @@
   }
 
   /* =========================================================
-     LOAD DATA
+     LOAD DATA FROM SHEETS
      ========================================================= */
   async function loadDataFromSheets(){
     try{
       menuList = await window.__three4five_sheets.getMenu();
       if(!Array.isArray(menuList)) menuList = [];
-
       renderMenu();
-
-      console.log('[App] loaded menu from Sheets', menuList.length);
     }catch(e){
       console.error('[App] loadData error', e);
       showToast('Gagal memuat data dari Sheets');
@@ -430,7 +496,7 @@
   }
 
   /* =========================================================
-     MENU
+     RENDER MENU
      ========================================================= */
   function renderMenu(){
     const grid = document.getElementById('menu-grid');
@@ -440,13 +506,12 @@
       ? menuList
       : menuList.filter(item => String(item.category || '').toLowerCase() === activeCategory);
 
-    document.getElementById('menu-count').textContent =
-      `${filtered.length} menu`;
+    document.getElementById('menu-count').textContent = `${filtered.length} menu`;
 
     if(!filtered.length){
       grid.innerHTML = `
         <div class="empty-menu">
-          <div style="font-size:28px;margin-bottom:8px">☕</div>
+          <div style="font-size:32px;margin-bottom:8px">☕</div>
           Tidak ada menu pada kategori ini.
         </div>`;
       return;
@@ -484,9 +549,7 @@
     });
   }
 
-  /* =========================================================
-     CATEGORY FILTER
-     ========================================================= */
+  /* CATEGORY FILTER LISTENERS */
   document.querySelectorAll('.category-btn').forEach(btn => {
     btn.addEventListener('click', function(){
       document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
@@ -497,7 +560,7 @@
   });
 
   /* =========================================================
-     CART
+     CART LOGIC
      ========================================================= */
   function addToCart(id){
     const item = menuList.find(m => String(m.id) === String(id));
@@ -509,10 +572,10 @@
       ex.qty++;
     }else{
       cart.push({
-        id:item.id,
-        name:item.name,
-        price:Number(item.price)||0,
-        qty:1
+        id: item.id,
+        name: item.name,
+        price: Number(item.price) || 0,
+        qty: 1
       });
     }
 
@@ -521,20 +584,20 @@
   }
 
   function removeCart(idx){
-    cart.splice(idx,1);
+    cart.splice(idx, 1);
     renderCart();
   }
 
   function renderCart(){
     const el = document.getElementById('cart-list');
-    const count = cart.reduce((sum,item)=>sum + item.qty,0);
+    const count = cart.reduce((sum, item) => sum + item.qty, 0);
 
     document.getElementById('cart-count').textContent = count;
 
     if(!cart.length){
       el.innerHTML = `
         <div class="empty-cart">
-          <div class="cart-empty-icon">🛒</div>
+          <div style="font-size:32px;margin-bottom:8px">🛍️</div>
           Belum ada menu yang dipilih
         </div>`;
 
@@ -550,7 +613,7 @@
     let subtotal = 0;
     el.innerHTML = '';
 
-    cart.forEach((c,idx)=>{
+    cart.forEach((c, idx) => {
       const itemTotal = c.price * c.qty;
       subtotal += itemTotal;
 
@@ -578,7 +641,7 @@
   }
 
   /* =========================================================
-     PAYMENT METHOD & CHANGE CALCULATION
+     PAYMENT & CHANGE CALCULATION
      ========================================================= */
   function getPaymentMethod(){
     const checked = document.querySelector('input[name="payment"]:checked');
@@ -587,10 +650,9 @@
 
   function calculateChange(){
     const method = getPaymentMethod();
-    const total = cart.reduce((s,i)=>s + (i.price*i.qty),0);
+    const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
     const cashInput = document.getElementById('cash-received');
     const changeText = document.getElementById('change-text');
-    const changeRow = document.getElementById('change-row');
 
     if(method !== 'Tunai'){
       changeText.innerText = formatRupiah(0);
@@ -602,8 +664,8 @@
     changeText.innerText = formatRupiah(change);
   }
 
-  document.querySelectorAll('input[name="payment"]').forEach(input=>{
-    input.addEventListener('change',function(){
+  document.querySelectorAll('input[name="payment"]').forEach(input => {
+    input.addEventListener('change', function(){
       const method = getPaymentMethod();
       const cashWrap = document.getElementById('cash-wrap');
       const changeRow = document.getElementById('change-row');
@@ -621,7 +683,7 @@
   document.getElementById('cash-received').addEventListener('input', calculateChange);
 
   /* =========================================================
-     PAYMENT
+     PROSES BAYAR & CETAK NOTA
      ========================================================= */
   document.getElementById('btn-pay').addEventListener('click', async function(){
     if(cart.length === 0){
@@ -631,21 +693,26 @@
 
     const method = getPaymentMethod();
     const cash = Number(document.getElementById('cash-received').value) || 0;
-    const total = cart.reduce((s,i)=>s + (i.price*i.qty),0);
+    const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
 
     if(method === 'Tunai' && cash < total){
       showToast('Uang tunai kurang');
       return;
     }
 
+    const now = new Date();
+    const trxId = 'T345-' + Math.floor(1000 + Math.random() * 9000);
+    const change = method === 'Tunai' ? cash - total : 0;
+
     const trx = {
-      date:new Date().toISOString(),
-      items:cart,
-      method:method,
-      total:total,
-      cashReceived:method === 'Tunai' ? cash : total,
-      change:method === 'Tunai' ? cash-total : 0,
-      timestamp:Date.now()
+      id: trxId,
+      date: now.toISOString(),
+      items: [...cart],
+      method: method,
+      total: total,
+      cashReceived: method === 'Tunai' ? cash : total,
+      change: change,
+      timestamp: Date.now()
     };
 
     const btn = this;
@@ -653,29 +720,57 @@
     btn.disabled = true;
     btn.textContent = 'Menyimpan...';
 
-    try{
+    try {
       const r = await window.__three4five_sheets.addTransaction(trx);
 
       if(r && r.ok){
-        showToast('✓ Transaksi berhasil disimpan');
+        showToast('✓ Transaksi berhasil');
+        
+        // Populate Struk Modal
+        populateReceipt(trx, now);
+        receiptModalInstance.show();
+
+        // Reset Cart
         cart = [];
         document.getElementById('cash-received').value = '';
         renderCart();
         loadDataFromSheets();
-      }else{
+      } else {
         showToast('Gagal menyimpan transaksi');
       }
-    }catch(e){
+    } catch(e) {
       console.error(e);
       showToast('Error saat menyimpan transaksi');
-    }finally{
+    } finally {
       btn.textContent = originalText;
       if(cart.length) btn.disabled = false;
     }
   });
 
+  function populateReceipt(trx, dateObj){
+    document.getElementById('rec-id').innerText = '#' + trx.id;
+    document.getElementById('rec-date').innerText = dateObj.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
+    document.getElementById('rec-method').innerText = trx.method;
+    
+    const tbody = document.getElementById('rec-items');
+    tbody.innerHTML = '';
+    
+    trx.items.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td style="width:55%">${escapeHtml(item.name)}<br><small>${item.qty} x ${formatRupiah(item.price)}</small></td>
+        <td style="width:45%; text-align:right;">${formatRupiah(item.qty * item.price)}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    document.getElementById('rec-total').innerText = formatRupiah(trx.total);
+    document.getElementById('rec-cash').innerText = formatRupiah(trx.cashReceived);
+    document.getElementById('rec-change').innerText = formatRupiah(trx.change);
+  }
+
   /* =========================================================
-     NAVIGASI & SHELL
+     INITIALIZATION & NAVIGATION
      ========================================================= */
   const sidebar = document.getElementById('sidebar');
   const mobileMenuBtn = document.getElementById('mobile-menu');
@@ -684,12 +779,11 @@
     sidebar.classList.toggle('open');
   });
 
-  /* =========================================================
-     INITIALIZATION
-     ========================================================= */
   document.addEventListener('DOMContentLoaded', async function() {
     updateDate();
     renderCart();
+    
+    receiptModalInstance = new bootstrap.Modal(document.getElementById('receiptModal'));
     
     if (window.__three4five_config && window.__three4five_config.forceSyncOnLoad) {
       await loadDataFromSheets();
