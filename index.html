@@ -3,98 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kasir POS - Three4Five Coffee</title>
+  <title>Kasir POS - Kelola Menu</title>
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
     body { display: flex; gap: 20px; padding: 20px; margin: 0; background-color: #f4f4f9; }
     
-    /* Layout Utama */
     .section-menu { flex: 2; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .section-cart { flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     
-    /* Grid Menu */
-    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 15px; }
-    .menu-card { border: 1px solid #ddd; padding: 15px; border-radius: 6px; text-align: center; cursor: pointer; background: #fafafa; transition: 0.2s; }
-    .menu-card:hover { background: #eef; border-color: #007bff; }
-    .menu-card h4 { margin: 0 0 8px 0; font-size: 16px; }
-    .menu-card p { margin: 0; color: #28a745; font-weight: bold; }
+    .menu-header { display: flex; justify-content: space-between; align-items: center; }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }
     
-    /* List Keranjang */
-    .cart-list { list-style: none; padding: 0; margin: 15px 0; max-height: 300px; overflow-y: auto; }
+    .menu-card { border: 1px solid #ddd; padding: 12px; border-radius: 6px; background: #fafafa; position: relative; text-align: center; }
+    .menu-card h4 { margin: 0 0 5px 0; font-size: 15px; }
+    .menu-card p { margin: 0 0 10px 0; color: #28a745; font-weight: bold; }
+    
+    /* Action Buttons */
+    .btn-action-group { display: flex; gap: 5px; }
+    .btn { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    .btn-add { background: #007bff; color: white; }
+    .btn-edit { background: #ffc107; color: #333; font-size: 12px; width: 100%; }
+    .btn-cart { background: #28a745; color: white; font-size: 12px; width: 100%; margin-bottom: 5px; }
+    .btn-primary { background: #28a745; color: white; width: 100%; margin-top: 10px; }
+    
+    .cart-list { list-style: none; padding: 0; margin: 15px 0; max-height: 250px; overflow-y: auto; }
     .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
-    .total-box { font-size: 18px; font-weight: bold; margin-top: 15px; text-align: right; }
     
-    /* Tombol */
-    .btn { width: 100%; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-    .btn-primary { background: #28a745; color: white; margin-top: 10px; }
-    .btn-primary:disabled { background: #ccc; }
+    /* Modal Styles */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+    .modal-content { background: #fff; padding: 20px; border-radius: 8px; width: 300px; display: flex; flex-direction: column; gap: 10px; }
+    .modal-content input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    .modal-btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <!-- SEKSI DAFTAR MENU -->
+  <!-- SEKSI MENU -->
   <div class="section-menu">
-    <h2>Daftar Menu</h2>
+    <div class="menu-header">
+      <h2>Daftar Menu</h2>
+      <button class="btn btn-add" onclick="openModalTambah()">+ Tambah Menu</button>
+    </div>
     <div id="loading-menu">Memuat data menu...</div>
     <div id="menu-grid" class="menu-grid"></div>
   </div>
 
-  <!-- SEKSI KERANJANG TRANSAKSI -->
+  <!-- SEKSI KERANJANG -->
   <div class="section-cart">
     <h2>Keranjang Transaksi</h2>
     <form id="form-transaksi">
       <ul id="cart-list" class="cart-list">
         <li style="color: #888; text-align: center;">Belum ada pesanan</li>
       </ul>
-      
-      <div class="total-box">
+      <div style="font-size: 18px; font-weight: bold; text-align: right;">
         Total: Rp <span id="total-harga">0</span>
       </div>
-
       <button type="submit" id="btn-submit" class="btn btn-primary" disabled>Proses Transaksi</button>
     </form>
   </div>
 
-  <script>
-    // Ganti dengan URL Web App Google Apps Script Anda
-    const URL_APPS_SCRIPT = "GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA";
+  <!-- MODAL TAMBAH / EDIT MENU -->
+  <div id="modalMenu" class="modal">
+    <div class="modal-content">
+      <h3 id="modal-title">Tambah Menu</h3>
+      <input type="hidden" id="edit-nama-lama">
+      <label>Nama Menu:</label>
+      <input type="text" id="input-nama" placeholder="Contoh: Kopi Susu">
+      <label>Harga (Rp):</label>
+      <input type="number" id="input-harga" placeholder="15000">
+      <div class="modal-btns">
+        <button class="btn" onclick="closeModal()">Batal</button>
+        <button class="btn btn-add" id="btn-simpan-menu" onclick="simpanMenu()">Simpan</button>
+      </div>
+    </div>
+  </div>
 
-    // PISAHKAN STATE: Master Menu & Data Keranjang
+  <script>
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzih2YF2_IoDn1pqmzxV-qMK_T_Tpi9q8b7yRR6ggFMW4YMLGvqkNFSvabGiZPszp7g/exec";
+
     let masterDataMenu = []; 
     let keranjangData = [];
+    let isEditMode = false;
 
-    // 1. MUAT DATA MENU SAAT HALAMAN PERTAMA KALI DIBUKA
-    document.addEventListener("DOMContentLoaded", function() {
-      fetchMenuData();
-    });
+    document.addEventListener("DOMContentLoaded", fetchMenuData);
 
+    // 1. READ MENU
     function fetchMenuData() {
+      document.getElementById("loading-menu").style.display = "block";
       fetch(URL_APPS_SCRIPT)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
           document.getElementById("loading-menu").style.display = "none";
-          masterDataMenu = data; // Simpan ke Master Data (Permanen di memory JS)
+          masterDataMenu = data;
           renderMenuGrid(masterDataMenu);
         })
         .catch(err => {
           document.getElementById("loading-menu").innerText = "Gagal memuat menu!";
-          console.error("Error fetching menu:", err);
         });
     }
 
-    // 2. RENDER MASTER MENU KE TAMPILAN (Tidak terpengaruh transaksi)
     function renderMenuGrid(items) {
       const menuContainer = document.getElementById("menu-grid");
       menuContainer.innerHTML = ""; 
 
-      if (!items || items.length === 0) {
-        menuContainer.innerHTML = "<p>Data menu kosong.</p>";
-        return;
-      }
-
       items.forEach(item => {
-        // Penanganan properti harga/nama yang toleran
-        const nama = item.Nama || item.nama || item.Item || item[0] || "Menu";
+        const nama = item.Nama || item.nama || item[0] || "Menu";
         const harga = item.Harga || item.harga || item[1] || 0;
 
         const card = document.createElement("div");
@@ -102,13 +115,81 @@
         card.innerHTML = `
           <h4>${nama}</h4>
           <p>Rp ${Number(harga).toLocaleString("id-ID")}</p>
+          <button class="btn btn-cart" onclick="tambahKeKeranjang('${nama}', ${harga})">+ Keranjang</button>
+          <button class="btn btn-edit" onclick="openModalEdit('${nama}', ${harga})">Edit</button>
         `;
-        card.onclick = () => tambahKeKeranjang(nama, Number(harga));
         menuContainer.appendChild(card);
       });
     }
 
-    // 3. TAMBAH ITEM KE KERANJANG
+    // 2. MODAL CONTROL
+    function openModalTambah() {
+      isEditMode = false;
+      document.getElementById("modal-title").innerText = "Tambah Menu Baru";
+      document.getElementById("input-nama").value = "";
+      document.getElementById("input-harga").value = "";
+      document.getElementById("modalMenu").style.display = "flex";
+    }
+
+    function openModalEdit(nama, harga) {
+      isEditMode = true;
+      document.getElementById("modal-title").innerText = "Edit Menu";
+      document.getElementById("edit-nama-lama").value = nama;
+      document.getElementById("input-nama").value = nama;
+      document.getElementById("input-harga").value = harga;
+      document.getElementById("modalMenu").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("modalMenu").style.display = "none";
+    }
+
+    // 3. TAMBAH & EDIT MENU (CALL APPS SCRIPT)
+    function simpanMenu() {
+      const namaInput = document.getElementById("input-nama").value.trim();
+      const hargaInput = document.getElementById("input-harga").value.trim();
+      const namaLama = document.getElementById("edit-nama-lama").value;
+
+      if (!namaInput || !hargaInput) {
+        alert("Harap isi nama dan harga menu!");
+        return;
+      }
+
+      const btnSimpan = document.getElementById("btn-simpan-menu");
+      btnSimpan.innerText = "Menyimpan...";
+      btnSimpan.disabled = true;
+
+      const formData = new URLSearchParams();
+
+      if (isEditMode) {
+        formData.append("action", "edit_menu");
+        formData.append("namaLama", namaLama);
+        formData.append("namaBaru", namaInput);
+        formData.append("hargaBaru", hargaInput);
+      } else {
+        formData.append("action", "tambah_menu");
+        formData.append("nama", namaInput);
+        formData.append("harga", hargaInput);
+      }
+
+      fetch(URL_APPS_SCRIPT, {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(res => {
+        alert(res.message);
+        closeModal();
+        fetchMenuData(); // Muat ulang menu terbaru dari spreadsheet
+      })
+      .catch(err => alert("Gagal menyimpan menu."))
+      .finally(() => {
+        btnSimpan.innerText = "Simpan";
+        btnSimpan.disabled = false;
+      });
+    }
+
+    // 4. TRANSAKSI (TETAP UTUH)
     function tambahKeKeranjang(nama, harga) {
       const idx = keranjangData.findIndex(i => i.nama === nama);
       if (idx > -1) {
@@ -120,7 +201,6 @@
       updateCartView();
     }
 
-    // 4. UPDATE TAMPILAN KERANJANG & TOTAL
     function updateCartView() {
       const cartContainer = document.getElementById("cart-list");
       const btnSubmit = document.getElementById("btn-submit");
@@ -138,10 +218,7 @@
         grandTotal += item.subtotal;
         const li = document.createElement("li");
         li.className = "cart-item";
-        li.innerHTML = `
-          <span>${item.nama} x${item.qty}</span>
-          <span>Rp ${item.subtotal.toLocaleString("id-ID")}</span>
-        `;
+        li.innerHTML = `<span>${item.nama} x${item.qty}</span><span>Rp ${item.subtotal.toLocaleString("id-ID")}</span>`;
         cartContainer.appendChild(li);
       });
 
@@ -149,15 +226,11 @@
       btnSubmit.disabled = false;
     }
 
-    // 5. PROSES SUBMIT TRANSAKSI (AMNAN TANPA MENGHAPUS MENU)
     document.getElementById("form-transaksi").addEventListener("submit", function(e) {
-      e.preventDefault(); // SANGAT PENTING: Mencegah reload/submit default browser
-
+      e.preventDefault();
       const btnSubmit = document.getElementById("btn-submit");
       btnSubmit.disabled = true;
-      btnSubmit.innerText = "Menyimpan...";
 
-      // Format data pesanan sesuai kebutuhan Apps Script Anda
       const detailPesanan = keranjangData.map(i => `${i.nama} (${i.qty})`).join(", ");
       const totalBayar = keranjangData.reduce((acc, i) => acc + i.subtotal, 0);
 
@@ -166,30 +239,15 @@
       formData.append("items", detailPesanan);
       formData.append("total", totalBayar);
 
-      fetch(URL_APPS_SCRIPT, {
-        method: "POST",
-        body: formData
-      })
+      fetch(URL_APPS_SCRIPT, { method: "POST", body: formData })
       .then(res => res.json())
       .then(res => {
-        alert("Transaksi Berhasil Disimpan!");
-        resetKeranjangOnly(); // Hanya hapus keranjang, Master Menu TIDAK disentuh
+        alert("Transaksi Berhasil!");
+        keranjangData = [];
+        updateCartView();
       })
-      .catch(err => {
-        alert("Gagal menyimpan transaksi, periksa koneksi.");
-        console.error("Error post:", err);
-      })
-      .finally(() => {
-        btnSubmit.innerText = "Proses Transaksi";
-      });
+      .finally(() => btnSubmit.disabled = false);
     });
-
-    // 6. KHUSUS UNTUK MENGOSONGKAN KERANJANG SAJA
-    function resetKeranjangOnly() {
-      keranjangData = []; // Kosongkan array keranjang saja
-      updateCartView();   // Render ulang elemen keranjang
-      // Catatan: masterDataMenu & elemen #menu-grid TIDAK ikut dikosongkan/disentuh
-    }
   </script>
 </body>
 </html>
